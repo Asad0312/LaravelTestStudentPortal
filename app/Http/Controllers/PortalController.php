@@ -1,0 +1,153 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Admission;
+use App\Models\Alert;
+use App\Models\Attendance;
+use App\Models\Fee;
+use App\Models\Mark;
+use App\Models\Message;
+use App\Models\Payment;
+use App\Models\SchoolClass;
+use App\Models\Student;
+use App\Models\Test;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+
+class PortalController extends Controller
+{
+    public function show(Request $request)
+    {
+        $student = Student::find($request->session()->get('student_id'));
+        if (!$student) {
+            $request->session()->flush();
+
+            return redirect()->route('login');
+        }
+
+        /* attendance summary */
+        $attRows = Attendance::where('student_id', $student->id)->orderByDesc('date')->limit(7)->get();
+        $total   = Attendance::where('student_id', $student->id)->count();
+        $present = Attendance::where('student_id', $student->id)->where('status', 'Present')->count();
+
+        $week = $attRows->sortBy('date')->map(fn ($a) => $a->status === 'Present' ? 1 : 0)->values()->all();
+        $week = array_pad($week, 7, 0);
+
+        /* fee */
+        $feeRow = $student->fees()->orderByDesc('month')->first();
+        $monthly = (int) ($feeRow->monthly_amount ?? 0);
+        $paid    = (int) ($feeRow->paid_amount ?? 0);
+        $rem     = max(0, $monthly - $paid);
+        $feeStatus = $rem <= 0 ? 'Paid' : ($paid > 0 ? 'Pending' : 'Unpaid');
+        $feePct    = $monthly > 0 ? round(($paid / $monthly) * 100) : 0;
+
+        /* academics */
+        $tests = Test::where('class_no', $student->class_no)
+            ->where('section', $student->section)
+            ->orderBy('test_date')
+            ->get();
+
+        $marks = Mark::with('test')
+            ->where('student_id', $student->id)
+            ->get()
+            ->map(function (Mark $m) {
+                $total = (int) $m->test->total_marks;
+                $obt   = (int) $m->obtained;
+
+                return [
+                    'type'     => $m->test->type,
+                    'subject'  => $m->test->subject,
+                    'date'     => $m->test->test_date,
+                    'obtained' => $obt,
+                    'total'    => $total,
+                    'percent'  => $total > 0 ? round(($obt / $total) * 100, 1) : 0,
+                ];
+            });
+
+        $alerts = Alert::where('class_no', $student->class_no)
+            ->where(function ($q) use ($student) {
+                $q->where('section', $student->section)->orWhere('section', '');
+            })
+            ->orderByDesc('id')
+            ->limit(6)
+            ->get();
+
+        $payments = $student->payments()->orderByDesc('paid_on')->orderByDesc('id')->get();
+
+        $messages = Message::forStudent($student)->orderByDesc('id')->limit(10)->get();
+
+        $classInfo = SchoolClass::where('class_no', $student->class_no)
+            ->where('section', $student->section)
+            ->first()
+            ?? SchoolClass::where('class_no', $student->class_no)->first();
+
+        return view('portal.show', [
+            'student'  => $student,
+            'att'      => [
+                'present' => $present,
+                'total'   => $total,
+                'percent' => $total > 0 ? round(($present / $total) * 100, 1) : 0,
+                'week'    => $week,
+            ],
+            'fee' => [
+                'monthly'   => $monthly,
+                'paid'      => $paid,
+                'remaining' => $rem,
+                'status'    => $feeStatus,
+                'month'     => $feeRow ? date('F Y', strtotime($feeRow->month . '-01')) : '—',
+                'pct'       => $feePct,
+            ],
+            'payments' => $payments,
+            'tests'    => $tests,
+            'marks'    => $marks,
+            'alerts'   => $alerts,
+            'messages' => $messages,
+            'classInfo'=> $classInfo,
+            'syncStamp'=> $this->syncStamp($student),
+        ]);
+    }
+
+    /** Sirf ID card ka clean printable page (poora portal nahi). */
+    public function idCard(Request $request)
+    {
+        $student = Student::find($request->session()->get('student_id'));
+        if (!$student) {
+            $request->session()->flush();
+
+            return redirect()->route('login');
+        }
+
+        return view('portal.id-card', ['student' => $student]);
+    }
+
+    public function sync(Request $request): JsonResponse
+    {
+        $student = Student::find($request->session()->get('student_id'));
+        if (!$student) {
+            return response()->json(['ok' => false, 'error' => 'Login required'], 401);
+        }
+
+        return response()->json([
+            'ok'      => true,
+            'stamp'   => $this->syncStamp($student),
+            'message' => 'Naya update aa gaya — page refresh ho raha hai.',
+        ]);
+    }
+
+    private function syncStamp(Student $student): string
+    {
+        $parts = [
+            Test::where('class_no', $student->class_no)->where('section', $student->section)->count(),
+            Mark::where('student_id', $student->id)->count(),
+            Alert::where('class_no', $student->class_no)->max('id'),
+            Fee::where('student_id', $student->id)->max('paid_amount'),
+            Payment::where('student_id', $student->id)->max('id'),
+            Attendance::where('student_id', $student->id)->max('id'),
+            Message::max('id'),
+        ];
+
+        return md5(implode('|', $parts));
+    }
+}

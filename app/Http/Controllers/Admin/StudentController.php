@@ -1,0 +1,159 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Alert;
+use App\Models\Attendance;
+use App\Models\Fee;
+use App\Models\Mark;
+use App\Models\Payment;
+use App\Models\Student;
+use App\Services\UploadNotifier;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+
+class StudentController extends Controller
+{
+    public function index(Request $request)
+    {
+        $q = trim((string) $request->query('q', ''));
+
+        $students = Student::query()
+            ->when($q !== '', function ($query) use ($q) {
+                $query->where(function ($w) use ($q) {
+                    $w->where('name', 'like', "%{$q}%")
+                        ->orWhere('student_id', 'like', "%{$q}%")
+                        ->orWhere('section', 'like', "%{$q}%")
+                        ->orWhere('class_no', 'like', "%{$q}%");
+                });
+            })
+            ->orderByRaw("CAST(SUBSTRING_INDEX(student_id, '-', -1) AS UNSIGNED)")
+            ->get();
+
+        return view('admin.students', [
+            'students' => $students,
+            'q'        => $q,
+            'nextId'   => Student::nextStudentId(),
+        ]);
+    }
+
+    public function nextId()
+    {
+        return response()->json(['next_id' => Student::nextStudentId()]);
+    }
+
+    public function store(Request $request, UploadNotifier $notifier)
+    {
+        $data = $request->validate([
+            'name'        => ['required', 'string', 'max:150'],
+            'father_name' => ['nullable', 'string', 'max:150'],
+            'phone'       => ['nullable', 'string', 'max:40'],
+            'email'       => ['nullable', 'email', 'max:190'],
+            'address'     => ['nullable', 'string', 'max:255'],
+            'class_no'    => ['required', 'integer', 'between:1,12'],
+            'section'     => ['required', 'string', 'max:8'],
+            'status'      => ['nullable', 'string', 'max:20'],
+        ]);
+
+        $plainPassword = $request->input('password')
+            ?: Student::defaultPassword($data['name']);
+        $cls    = (int) $data['class_no'];
+        $section = $data['section'];
+
+        DB::beginTransaction();
+        try {
+            $student = Student::create([
+                'student_id'     => Student::nextStudentId(),
+                'name'           => $data['name'],
+                'father_name'    => (string) ($data['father_name'] ?? ''),
+                'phone'          => (string) ($data['phone'] ?? ''),
+                'email'          => (string) ($data['email'] ?? ''),
+                'address'        => (string) ($data['address'] ?? ''),
+                'class_no'       => $cls,
+                'section'        => $section,
+                'batch'          => 'Session ' . date('Y'),
+                'admission_date' => now()->toDateString(),
+                'status'         => $data['status'] ?? 'Active',
+                'password'       => Hash::make($plainPassword),
+                'avatar_seed'    => $data['name'],
+            ]);
+
+            Fee::firstOrCreate(
+                ['student_id' => $student->id, 'month' => date('Y-m')],
+                ['monthly_amount' => Student::defaultFeeForClass($cls), 'paid_amount' => 0]
+            );
+
+            Alert::create([
+                'class_no' => $cls,
+                'section'  => $section,
+                'msg'      => "New student registered: {$student->name} (Class {$cls}-{$section}) — ID {$student->student_id}",
+            ]);
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
+
+        $notifier->notify(
+            'New student registered',
+            "{$student->name} (ID: {$student->student_id}) — Class {$cls}-{$section}\nPortal password: {$plainPassword}",
+            $cls,
+            $section
+        );
+
+        return back()->with('success', "Student add ho gaya. Student ID: {$student->student_id} • Password: {$plainPassword}");
+    }
+
+    public function update(Request $request, int $id)
+    {
+        $student = Student::find($id);
+        if (!$student) {
+            return back()->with('error', 'Student nahi mila.');
+        }
+
+        $data = $request->validate([
+            'name'        => ['required', 'string', 'max:150'],
+            'father_name' => ['nullable', 'string', 'max:150'],
+            'phone'       => ['nullable', 'string', 'max:40'],
+            'email'       => ['nullable', 'email', 'max:190'],
+            'address'     => ['nullable', 'string', 'max:255'],
+            'class_no'    => ['required', 'integer', 'between:1,12'],
+            'section'     => ['required', 'string', 'max:8'],
+            'status'      => ['nullable', 'string', 'max:20'],
+        ]);
+
+        $student->update([
+            'name'        => $data['name'],
+            'father_name' => (string) ($data['father_name'] ?? ''),
+            'phone'       => (string) ($data['phone'] ?? ''),
+            'email'       => (string) ($data['email'] ?? ''),
+            'address'     => (string) ($data['address'] ?? ''),
+            'class_no'    => (int) $data['class_no'],
+            'section'     => $data['section'],
+            'status'      => $data['status'] ?? 'Active',
+        ]);
+
+        return back()->with('success', $student->name . ' update ho gaya.');
+    }
+
+    public function destroy(int $id)
+    {
+        $student = Student::find($id);
+        if (!$student) {
+            return back()->with('error', 'Student nahi mila.');
+        }
+
+        DB::transaction(function () use ($student) {
+            Mark::where('student_id', $student->id)->delete();
+            Attendance::where('student_id', $student->id)->delete();
+            Payment::where('student_id', $student->id)->delete();
+            Fee::where('student_id', $student->id)->delete();
+            $student->delete();
+        });
+
+        return back()->with('success', 'Student delete ho gaya.');
+    }
+}
