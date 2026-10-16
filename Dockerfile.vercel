@@ -1,23 +1,32 @@
-FROM dunglas/frankenphp:1-php8.3-bookworm
+FROM dunglas/frankenphp:1-php8.3-bookworm AS base
 
-# Laravel ko chahiye PHP extensions
-RUN install-php-extensions pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd intl zip opcache
+RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && install-php-extensions pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd intl zip opcache
 
-# Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
-COPY . /app
 
-# Production dependencies
+FROM base AS dependencies
+COPY . .
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 
-# FrankenPHP (Caddy) config
-COPY Caddyfile /etc/frankenphp/Caddyfile
+FROM base AS runtime
+COPY --from=dependencies --chown=www-data:www-data /app /app
+COPY --chown=www-data:www-data Caddyfile /etc/frankenphp/Caddyfile
 
-# Laravel writable dirs
-RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache storage/logs bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache
+# Vercel ka filesystem read-only hai — sirf /tmp writable. Laravel ko /tmp par bhejo.
+RUN mkdir -p /tmp/laravel/views /tmp/laravel/sessions /tmp/laravel/cache \
+    && chmod -R 777 /tmp/laravel
 
-ENV PORT=8080
+ENV PORT=8080 \
+    APP_ENV=production \
+    APP_DEBUG=false \
+    LOG_CHANNEL=stderr \
+    SESSION_DRIVER=cookie \
+    CACHE_STORE=array \
+    QUEUE_CONNECTION=sync \
+    VIEW_COMPILED_PATH=/tmp/laravel/views
+
 EXPOSE 8080
+CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
