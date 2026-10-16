@@ -13,6 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Vercel/hosting proxy trust karein taake X-Forwarded-Proto: https se
+        // sahi scheme detect ho (warna CSS/JS http:// par load honge).
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'admin'   => EnsureAdmin::class,
             'student' => EnsureStudent::class,
