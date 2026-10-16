@@ -56,6 +56,9 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');
     Route::post('attendance', [AttendanceController::class, 'mark'])->name('attendance.mark');
 
+    Route::get('scan', [AttendanceController::class, 'scanner'])->name('scan');
+    Route::post('attendance/scan', [AttendanceController::class, 'scan'])->name('attendance.scan');
+
     Route::get('fees', [FeeController::class, 'index'])->name('fees.index');
     Route::post('fees/payment', [FeeController::class, 'addPayment'])->name('fees.payment');
 

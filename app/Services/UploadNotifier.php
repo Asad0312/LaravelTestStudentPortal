@@ -31,7 +31,7 @@ class UploadNotifier
     {
         try {
             $admin = Admin::first();
-            $to    = $admin?->email ?: (string) env('ADMIN_EMAIL');
+            $to    = $admin?->email ?: (string) config('services.portal.admin.email');
 
             if ($to) {
                 Mail::to($to)->send(new UploadAlert(
@@ -77,7 +77,7 @@ class UploadNotifier
      */
     public function sendWhatsApp(string $message): void
     {
-        $template = (string) env('WHATSAPP_API_URL', '');
+        $template = (string) config('services.portal.whatsapp_url', '');
         if ($template === '') {
             return;
         }

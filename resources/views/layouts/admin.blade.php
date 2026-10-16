@@ -27,6 +27,7 @@
         'lookup'     => ['admin/lookup',        'fa-magnifying-glass','Student Lookup'],
         'messages'   => ['admin/messages',      'fa-bullhorn',        'Messages'],
         'attendance' => ['admin/attendance',    'fa-calendar-check',  'Attendance'],
+        'scan'       => ['admin/scan',          'fa-qrcode',          'QR Attendance'],
         'fees'       => ['admin/fees',          'fa-money-bill-wave', 'Fee Management'],
         'tests'      => ['admin/tests',         'fa-list-check',      'Test Plan'],
         'marks'      => ['admin/marks',         'fa-square-poll-vertical', 'Marks'],

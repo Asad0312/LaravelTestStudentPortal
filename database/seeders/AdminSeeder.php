@@ -14,9 +14,9 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        $email    = (string) env('ADMIN_EMAIL', 'admin@studenthub.com');
-        $password = (string) env('ADMIN_PASSWORD', 'admin123');
-        $name     = (string) env('ADMIN_NAME', 'Admin');
+        $email    = (string) config('services.portal.admin.email', 'admin@studenthub.com');
+        $password = (string) config('services.portal.admin.password', 'admin123');
+        $name     = (string) config('services.portal.admin.name', 'Admin');
 
         Admin::updateOrCreate(
             ['email' => $email],

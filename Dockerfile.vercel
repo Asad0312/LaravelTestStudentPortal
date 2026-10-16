@@ -1,0 +1,23 @@
+FROM dunglas/frankenphp:1-php8.3-bookworm
+
+# Laravel ko chahiye PHP extensions
+RUN install-php-extensions pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd intl zip opcache
+
+# Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+WORKDIR /app
+COPY . /app
+
+# Production dependencies
+RUN composer install --no-interaction --optimize-autoloader --no-dev
+
+# FrankenPHP (Caddy) config
+COPY Caddyfile /etc/frankenphp/Caddyfile
+
+# Laravel writable dirs
+RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache storage/logs bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
+
+ENV PORT=8080
+EXPOSE 8080

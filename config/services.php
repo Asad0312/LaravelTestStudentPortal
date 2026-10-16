@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'portal' => [
+        'admin' => [
+            'name'     => env('ADMIN_NAME', 'Admin'),
+            'email'    => env('ADMIN_EMAIL', 'admin@studenthub.com'),
+            'password' => env('ADMIN_PASSWORD', 'admin123'),
+        ],
+        'whatsapp_url' => env('WHATSAPP_API_URL', ''),
+    ],
+
 ];
