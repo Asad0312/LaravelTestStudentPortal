@@ -10,6 +10,7 @@ use App\Models\Mark;
 use App\Models\Payment;
 use App\Models\Student;
 use App\Services\UploadNotifier;
+use App\Support\Sql;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -29,7 +30,7 @@ class StudentController extends Controller
                         ->orWhere('class_no', 'like', "%{$q}%");
                 });
             })
-            ->orderByRaw("CAST(SUBSTRING_INDEX(student_id, '-', -1) AS UNSIGNED)")
+            ->orderByRaw(Sql::numericSuffix('student_id'))
             ->get();
 
         return view('admin.students', [

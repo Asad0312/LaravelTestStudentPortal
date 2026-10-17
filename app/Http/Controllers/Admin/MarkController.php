@@ -7,6 +7,7 @@ use App\Models\Mark;
 use App\Models\Student;
 use App\Models\Test;
 use App\Services\UploadNotifier;
+use App\Support\Sql;
 use Illuminate\Http\Request;
 
 class MarkController extends Controller
@@ -23,7 +24,7 @@ class MarkController extends Controller
         if ($test) {
             $rows = Student::where('class_no', $test->class_no)
                 ->where('section', $test->section)
-                ->orderByRaw("CAST(SUBSTRING_INDEX(student_id, '-', -1) AS UNSIGNED)")
+                ->orderByRaw(Sql::numericSuffix('student_id'))
                 ->get();
 
             $saved = Mark::where('test_id', $test->id)

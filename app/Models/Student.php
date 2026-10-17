@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Sql;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -50,7 +51,7 @@ class Student extends Model
     public static function nextStudentId(): string
     {
         $max = (int) static::query()
-            ->selectRaw("MAX(CAST(SUBSTRING_INDEX(student_id, '-', -1) AS UNSIGNED)) as m")
+            ->selectRaw('MAX(' . Sql::numericSuffix('student_id') . ') as m')
             ->value('m');
         if ($max < 1000) {
             $max = 1000;

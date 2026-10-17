@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Sql;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -25,7 +26,7 @@ class Test extends Model
     public static function nextTestCode(): string
     {
         $max = (int) static::selectRaw(
-            "MAX(CAST(SUBSTRING_INDEX(test_code, '-', -1) AS UNSIGNED)) as m"
+            'MAX(' . Sql::numericSuffix('test_code') . ') as m'
         )->value('m');
 
         return 'T-' . (max($max, 100) + 1);

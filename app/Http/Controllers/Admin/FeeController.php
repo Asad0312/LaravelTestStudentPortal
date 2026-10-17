@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Fee;
 use App\Models\Payment;
 use App\Models\Student;
+use App\Support\Sql;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,7 +14,7 @@ class FeeController extends Controller
 {
     public function index()
     {
-        $students = Student::orderByRaw("CAST(SUBSTRING_INDEX(student_id, '-', -1) AS UNSIGNED)")
+        $students = Student::orderByRaw(Sql::numericSuffix('student_id'))
             ->get()
             ->map(function (Student $s) {
                 $fee = $s->fees()->orderByDesc('month')->first();

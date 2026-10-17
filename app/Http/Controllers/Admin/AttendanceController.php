@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\Student;
+use App\Support\Sql;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,7 @@ class AttendanceController extends Controller
         $today = now()->toDateString();
 
         $students = Student::where('status', 'Active')
-            ->orderByRaw("CAST(SUBSTRING_INDEX(student_id, '-', -1) AS UNSIGNED)")
+            ->orderByRaw(Sql::numericSuffix('student_id'))
             ->get();
 
         $marked = Attendance::where('date', $today)
