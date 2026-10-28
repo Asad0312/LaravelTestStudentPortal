@@ -131,7 +131,7 @@ class AdmissionController extends Controller
                 'status'           => 'Active',
                 'password'         => Hash::make($admission->password),
                 'avatar_seed'      => $admission->name,
-                'monthly_fee'      => $monthlyFee ?? Student::defaultFeeForClass($cls),
+                'monthly_fee'      => ($monthlyFee !== null && $monthlyFee !== '') ? (float)$monthlyFee : Student::defaultFeeForClass($cls),
                 'notifications_enabled' => true,
             ]);
 
