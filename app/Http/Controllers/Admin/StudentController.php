@@ -66,8 +66,8 @@ class StudentController extends Controller
             ?: Student::defaultPassword($data['name']);
         $stream = $data['stream'] ?? 'school';
         $cls    = (int) ($data['class_level'] ?? $data['class_no'] ?? 6);
-        $section = $data['section'] ?? 'A';
-        $msection = strtoupper($data['madarsa_section'] ?? $section);
+        $msection = strtoupper($data['madarsa_section'] ?? 'A');
+        $section = $msection;
 
         DB::beginTransaction();
         try {
