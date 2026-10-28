@@ -5,11 +5,9 @@ namespace App\Models;
 use App\Support\Sql;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Student extends Model
 {
-    use SoftDeletes;
 
     protected $fillable = [
         'student_id', 'name', 'father_name', 'phone', 'whatsapp', 'email', 'address',
