@@ -28,14 +28,23 @@ class AdmissionController extends Controller
     public function store(Request $request, UploadNotifier $notifier)
     {
         $data = $request->validate([
-            'name'        => ['required', 'string', 'max:150'],
-            'father_name' => ['required', 'string', 'max:150'],
-            'phone'       => ['required', 'string', 'max:40'],
-            'email'       => ['nullable', 'email', 'max:190'],
-            'address'     => ['nullable', 'string', 'max:255'],
-            'class_no'    => ['required', 'integer', 'between:1,12'],
-            'section'     => ['nullable', 'string', 'max:8'],
+            'name'           => ['required', 'string', 'max:150'],
+            'father_name'    => ['required', 'string', 'max:150'],
+            'phone'          => ['required', 'string', 'max:40'],
+            'email'          => ['nullable', 'email', 'max:190'],
+            'address'        => ['nullable', 'string', 'max:255'],
+            'stream'         => ['nullable', 'in:school,madarsa,both'],
+            'class_no'       => ['nullable', 'integer', 'between:1,12'],
+            'class_level'    => ['nullable', 'integer', 'between:1,8'],
+            'section'        => ['nullable', 'string', 'max:8'],
+            'madarsa_section'=> ['nullable', 'string', 'max:1'],
+            'monthly_fee'    => ['nullable', 'numeric', 'min:0'],
         ]);
+
+        $stream = $data['stream'] ?? 'school';
+        $cls    = (int) ($data['class_level'] ?? $data['class_no'] ?? 6);
+        $section = $data['section'] ?? 'A';
+        $msection = strtoupper($data['madarsa_section'] ?? $section);
 
         $admission = Admission::create([
             'app_id'      => Admission::nextAppId(),
@@ -44,14 +53,14 @@ class AdmissionController extends Controller
             'phone'       => $data['phone'],
             'email'       => (string) ($data['email'] ?? ''),
             'address'     => (string) ($data['address'] ?? ''),
-            'class_no'    => (int) $data['class_no'],
-            'section'     => (string) ($data['section'] ?: 'A'),
+            'class_no'    => $cls,
+            'section'     => $msection,
             'student_id'  => Student::nextStudentId(),
             'password'    => Student::defaultPassword($data['name']),
             'status'      => 'Approved',
         ]);
 
-        $plainPassword = $this->admit($admission, $notifier);
+        $plainPassword = $this->admit($admission, $notifier, $stream, $cls, $msection, $data['monthly_fee'] ?? null);
 
         return back()->with(
             'success',
@@ -95,41 +104,47 @@ class AdmissionController extends Controller
      * Admission record ko student me convert karta hai (fee + alert + notification ke saath).
      * @return string plain password (student ko dene ke liye)
      */
-    private function admit(Admission $admission, UploadNotifier $notifier): string
+    private function admit(Admission $admission, UploadNotifier $notifier, string $stream = 'school', int $cls = 6, string $msection = 'A', $monthlyFee = null): string
     {
         $plainPassword = $admission->password;
 
-        DB::transaction(function () use ($admission) {
+        DB::transaction(function () use ($admission, $stream, $cls, $msection, $monthlyFee) {
             $admission->update(['status' => 'Approved']);
 
             $student = Student::create([
-                'student_id'     => $admission->student_id,
-                'name'           => $admission->name,
-                'father_name'    => $admission->father_name,
-                'phone'          => $admission->phone,
-                'email'          => $admission->email,
-                'address'        => $admission->address,
-                'class_no'       => (int) $admission->class_no,
-                'section'        => $admission->section,
-                'batch'          => 'Session ' . date('Y'),
-                'admission_date' => now()->toDateString(),
-                'status'         => 'Active',
-                'password'       => Hash::make($admission->password),
-                'avatar_seed'    => $admission->name,
+                'student_id'       => $admission->student_id,
+                'name'             => $admission->name,
+                'father_name'      => $admission->father_name,
+                'phone'            => $admission->phone,
+                'whatsapp'         => $admission->phone,
+                'email'            => $admission->email,
+                'address'          => $admission->address,
+                'stream'           => $stream,
+                'class_level'      => $stream === 'madarsa' ? null : $cls,
+                'madarsa_section'  => $stream === 'school' ? null : $msection,
+                'class_no'         => $cls,
+                'section'          => $msection,
+                'batch'            => 'Session ' . date('Y'),
+                'admission_date'   => now()->toDateString(),
+                'status'           => 'Active',
+                'password'         => Hash::make($admission->password),
+                'avatar_seed'      => $admission->name,
+                'monthly_fee'      => $monthlyFee ?? Student::defaultFeeForClass($cls),
+                'notifications_enabled' => true,
             ]);
 
             Fee::firstOrCreate(
                 ['student_id' => $student->id, 'month' => date('Y-m')],
                 [
-                    'monthly_amount' => Student::defaultFeeForClass((int) $admission->class_no),
+                    'monthly_amount' => (int) ($student->monthly_fee ?? Student::defaultFeeForClass($cls)),
                     'paid_amount'    => 0,
                 ]
             );
 
             Alert::create([
-                'class_no' => (int) $admission->class_no,
-                'section'  => $admission->section,
-                'msg'      => "Naya admission: {$admission->name} (ID {$admission->student_id}) joined Class {$admission->class_no}-{$admission->section}",
+                'class_no' => $cls,
+                'section'  => $msection,
+                'msg'      => "Naya admission: {$admission->name} ({$student->display_class}) — ID {$admission->student_id}",
             ]);
         });
 

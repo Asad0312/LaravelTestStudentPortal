@@ -1,18 +1,57 @@
 @extends('layouts.admin')
 
-@section('page_title', 'Admissions')
-@section('page_sub', 'Admin yahan se admission form bhare — submit karte hi student ban jata hai')
+@section('page_title', 'Naya Admission Form')
+@section('page_sub', 'Yahan se seedha admission form bharein — submit karte hi student register ho jayega')
 
 @section('content')
-<div class="card card-soft p-3 mb-3 d-flex flex-wrap gap-2 justify-content-between align-items-center">
-  <span class="muted" style="font-size:13px;">
-    <i class="fa-solid fa-circle-info text-primary"></i>
-    Admission form bharein — submit karte hi student register ho jata hai aur <b>Student ID + password</b> ban jata hai (wo student ko dein). Email alert bhi chala jayega.
-  </span>
-  <button class="btn-primary-grad" style="padding:9px 16px;font-size:13px;" data-bs-toggle="modal" data-bs-target="#addAdmissionModal">
-    <i class="fa-solid fa-plus me-1"></i> New Admission
-  </button>
+<div class="card card-soft p-3 mb-3">
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <div class="stat-icon bg-grad-primary" style="width:40px;height:40px;font-size:16px;"><i class="fa-solid fa-user-plus"></i></div>
+    <div>
+      <h5 class="mb-0 fw-bold">Naya Admission Form</h5>
+      <div class="muted" style="font-size:12px;">Form bhar ke submit karein, Student ID aur password foran ban jayega</div>
+    </div>
+  </div>
+  <form method="post" action="{{ route('admin.admissions.store') }}">
+    @csrf
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label class="muted" style="font-size:12px;">Type *</label>
+        <select class="form-ctrl" name="stream" id="admStream" required>
+          <option value="school" selected>School</option>
+          <option value="madarsa">Madarsa</option>
+          <option value="both">School + Madarsa</option>
+        </select>
+      </div>
+      <div class="col-md-4" id="admClassWrap">
+        <label class="muted" style="font-size:12px;">Class *</label>
+        <select class="form-ctrl" name="class_no">
+          @for($i = 1; $i <= 8; $i++)<option value="{{ $i }}" {{ $i === 6 ? 'selected' : '' }}>Class {{ $i }}</option>@endfor
+        </select>
+      </div>
+      <div class="col-md-4" id="admMadarsaWrap" style="display:none;">
+        <label class="muted" style="font-size:12px;">Madarsa Section *</label>
+        <select class="form-ctrl" name="madarsa_section">@foreach(['A','B','C','D'] as $sec)<option>{{ $sec }}</option>@endforeach</select>
+      </div>
+      <div class="col-md-6"><label class="muted" style="font-size:12px;">Student Name *</label><input class="form-ctrl" name="name" required placeholder="Pura naam likhein" /></div>
+      <div class="col-md-6"><label class="muted" style="font-size:12px;">Father Name *</label><input class="form-ctrl" name="father_name" required placeholder="Wald ka naam" /></div>
+      <div class="col-md-4"><label class="muted" style="font-size:12px;">WhatsApp / Phone *</label><input class="form-ctrl" name="phone" required placeholder="03XXXXXXXXX" /></div>
+      <div class="col-md-4"><label class="muted" style="font-size:12px;">Monthly Fee *</label><input class="form-ctrl" type="number" name="monthly_fee" value="2500" required /></div>
+      <div class="col-md-4"><label class="muted" style="font-size:12px;">Address</label><input class="form-ctrl" name="address" placeholder="Mukammal pata" /></div>
+    </div>
+    <div class="mt-3">
+      <button class="btn-primary-grad" style="padding:10px 22px;"><i class="fa-solid fa-check me-1"></i> Admission Complete Karein</button>
+    </div>
+  </form>
 </div>
+
+<script>
+document.getElementById('admStream')?.addEventListener('change', function(){
+  const v=this.value;
+  document.getElementById('admClassWrap').style.display = v==='madarsa'?'none':'';
+  document.getElementById('admMadarsaWrap').style.display = v==='school'?'none':'';
+});
+</script>
 
 <div class="card card-soft p-3">
   <div class="table-responsive">
