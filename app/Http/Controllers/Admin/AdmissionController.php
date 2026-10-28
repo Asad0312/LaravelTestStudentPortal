@@ -43,8 +43,10 @@ class AdmissionController extends Controller
 
         $stream = $data['stream'] ?? 'school';
         $cls    = (int) ($data['class_level'] ?? $data['class_no'] ?? 6);
-        $section = $data['section'] ?? 'A';
-        $msection = strtoupper($data['madarsa_section'] ?? $section);
+        $msection = strtoupper($data['madarsa_section'] ?? 'A');
+        $section = $msection;
+
+        $plainPass = $request->input('password') ?: Student::defaultPassword($data['name']);
 
         $admission = Admission::create([
             'app_id'      => Admission::nextAppId(),
@@ -56,7 +58,7 @@ class AdmissionController extends Controller
             'class_no'    => $cls,
             'section'     => $msection,
             'student_id'  => Student::nextStudentId(),
-            'password'    => Student::defaultPassword($data['name']),
+            'password'    => $plainPass,
             'status'      => 'Approved',
         ]);
 
