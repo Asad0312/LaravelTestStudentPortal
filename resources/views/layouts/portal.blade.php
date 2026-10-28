@@ -15,7 +15,7 @@
 <div class="portal-top anim-fade-up">
   <div class="brand-badge" style="font-size:16px;color:var(--primary-dark);">
     <div class="brand-logo" style="width:38px;height:38px;font-size:16px;"><i class="fa-solid fa-graduation-cap"></i></div>
-    <b>StudentHub</b> <span class="badge bg-soft-primary" style="font-size:11px;">Student Portal</span>
+    <b>IRAA</b> <span class="badge bg-soft-primary" style="font-size:11px;">{{ $student->stream === 'madarsa' ? 'Madarsa Portal' : ($student->stream === 'both' ? 'School + Madarsa Portal' : 'School Portal') }}</span>
   </div>
   <div class="ms-auto d-flex align-items-center gap-3">
     <div class="avatar-chip">

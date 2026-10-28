@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>@yield('title', 'Admin') — StudentHub</title>
+<title>@yield('title', 'Admin') — IRAA</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}" />
@@ -22,16 +22,19 @@
     $seg   = request()->segment(2) ?? 'dashboard';
     $admin = \App\Models\Admin::find(session('admin_id'));
     $nav = [
-        'dashboard'  => ['admin',               'fa-gauge-high',      'Dashboard'],
-        'students'   => ['admin/students',      'fa-users',           'Students'],
-        'lookup'     => ['admin/lookup',        'fa-magnifying-glass','Student Lookup'],
-        'messages'   => ['admin/messages',      'fa-bullhorn',        'Messages'],
-        'attendance' => ['admin/attendance',    'fa-calendar-check',  'Attendance'],
-        'scan'       => ['admin/scan',          'fa-qrcode',          'QR Attendance'],
-        'fees'       => ['admin/fees',          'fa-money-bill-wave', 'Fee Management'],
-        'tests'      => ['admin/tests',         'fa-list-check',      'Test Plan'],
-        'marks'      => ['admin/marks',         'fa-square-poll-vertical', 'Marks'],
-        'admissions' => ['admin/admissions',    'fa-book-open',       'Admissions'],
+        'dashboard'   => ['admin',                'fa-gauge-high',      'Dashboard'],
+        'students'    => ['admin/students',       'fa-users',           'Students'],
+        'admissions'  => ['admin/admissions',     'fa-user-plus',       'Admissions'],
+        'lookup'      => ['admin/lookup',         'fa-magnifying-glass','Student Lookup'],
+        'attendance'  => ['admin/attendance',     'fa-calendar-check',  'Attendance'],
+        'scan'        => ['admin/scan',           'fa-qrcode',          'QR Attendance'],
+        'fees'        => ['admin/fees',           'fa-money-bill-wave', 'Fee Management'],
+        'exams'       => ['admin/exams',          'fa-file-lines',      'Exams & Fees'],
+        'tests'       => ['admin/tests',          'fa-list-check',      'Test Plan'],
+        'marks'       => ['admin/marks',          'fa-square-poll-vertical', 'Marks'],
+        'books'       => ['admin/books',          'fa-book',            'Books'],
+        'messages'    => ['admin/messages',       'fa-bullhorn',        'Messages'],
+        'settings'    => ['admin/settings',       'fa-gear',            'Settings'],
     ];
 @endphp
 
@@ -41,8 +44,8 @@
     <div class="side-head">
       <div class="brand-logo"><i class="fa-solid fa-school"></i></div>
       <div>
-        <div class="brand-name">StudentHub</div>
-        <div class="brand-sub">School Management</div>
+        <div class="brand-name">IRAA</div>
+        <div class="brand-sub">Iqra Riffat ull Atfal Academy</div>
       </div>
     </div>
 

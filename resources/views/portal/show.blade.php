@@ -48,7 +48,7 @@
 
   <div class="news-ticker mb-4 anim-fade-up d1">
     <div class="ticker-track">
-      🎉 Welcome to Student Portal — Admin jab bhi test ya marks upload kare ga yahan foran aa jayega &nbsp;•&nbsp; Fee pending ho to jald pay karein &nbsp;•&nbsp; StudentHub
+      🎉 Welcome to IRAA Student Portal — Iqra Riffat ull Atfal Academy &nbsp;•&nbsp; Admin jab bhi test ya marks upload kare ga yahan foran aa jayega &nbsp;•&nbsp; Fee pending ho to jald pay karein
     </div>
   </div>
 
@@ -292,7 +292,7 @@
   </div>
 
   <div class="text-center mt-4">
-    <p class="muted" style="font-size:12px;"><i class="fa-solid fa-circle-info me-1"></i>Live database — aap ka data <b>MySQL</b> se aa raha hai. Sirf apna portal dikhta hai, admin panel yahan nahi hai.</p>
+    <p class="muted" style="font-size:12px;"><i class="fa-solid fa-circle-info me-1"></i>IRAA — Iqra Riffat ull Atfal Academy. Live database — aap ka data <b>MySQL</b> se aa raha hai. Sirf apna portal dikhta hai.</p>
   </div>
 </div>
 @endsection

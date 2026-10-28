@@ -48,37 +48,49 @@ class StudentController extends Controller
     public function store(Request $request, UploadNotifier $notifier)
     {
         $data = $request->validate([
-            'name'        => ['required', 'string', 'max:150'],
-            'father_name' => ['nullable', 'string', 'max:150'],
-            'phone'       => ['nullable', 'string', 'max:40'],
-            'email'       => ['nullable', 'email', 'max:190'],
-            'address'     => ['nullable', 'string', 'max:255'],
-            'class_no'    => ['required', 'integer', 'between:1,12'],
-            'section'     => ['required', 'string', 'max:8'],
-            'status'      => ['nullable', 'string', 'max:20'],
+            'name'           => ['required', 'string', 'max:150'],
+            'father_name'    => ['nullable', 'string', 'max:150'],
+            'phone'          => ['nullable', 'string', 'max:40'],
+            'email'          => ['nullable', 'email', 'max:190'],
+            'address'        => ['nullable', 'string', 'max:255'],
+            'stream'         => ['nullable', 'in:school,madarsa,both'],
+            'class_no'       => ['nullable', 'integer', 'between:1,12'],
+            'class_level'    => ['nullable', 'integer', 'between:1,8'],
+            'section'        => ['nullable', 'string', 'max:8'],
+            'madarsa_section'=> ['nullable', 'string', 'max:1'],
+            'monthly_fee'    => ['nullable', 'numeric', 'min:0'],
+            'status'         => ['nullable', 'string', 'max:20'],
         ]);
 
         $plainPassword = $request->input('password')
             ?: Student::defaultPassword($data['name']);
-        $cls    = (int) $data['class_no'];
-        $section = $data['section'];
+        $stream = $data['stream'] ?? 'school';
+        $cls    = (int) ($data['class_level'] ?? $data['class_no'] ?? 6);
+        $section = $data['section'] ?? 'A';
+        $msection = strtoupper($data['madarsa_section'] ?? $section);
 
         DB::beginTransaction();
         try {
             $student = Student::create([
-                'student_id'     => Student::nextStudentId(),
-                'name'           => $data['name'],
-                'father_name'    => (string) ($data['father_name'] ?? ''),
-                'phone'          => (string) ($data['phone'] ?? ''),
-                'email'          => (string) ($data['email'] ?? ''),
-                'address'        => (string) ($data['address'] ?? ''),
-                'class_no'       => $cls,
-                'section'        => $section,
-                'batch'          => 'Session ' . date('Y'),
-                'admission_date' => now()->toDateString(),
-                'status'         => $data['status'] ?? 'Active',
-                'password'       => Hash::make($plainPassword),
-                'avatar_seed'    => $data['name'],
+                'student_id'       => Student::nextStudentId(),
+                'name'             => $data['name'],
+                'father_name'      => (string) ($data['father_name'] ?? ''),
+                'phone'            => (string) ($data['phone'] ?? ''),
+                'whatsapp'         => (string) ($data['phone'] ?? ''),
+                'email'            => (string) ($data['email'] ?? ''),
+                'address'          => (string) ($data['address'] ?? ''),
+                'stream'           => $stream,
+                'class_level'      => $stream === 'madarsa' ? null : $cls,
+                'madarsa_section'  => $stream === 'school' ? null : $msection,
+                'class_no'         => $cls,
+                'section'          => $section,
+                'batch'            => 'Session ' . date('Y'),
+                'admission_date'   => now()->toDateString(),
+                'status'           => $data['status'] ?? 'Active',
+                'password'         => Hash::make($plainPassword),
+                'avatar_seed'      => $data['name'],
+                'monthly_fee'      => $data['monthly_fee'] ?? Student::defaultFeeForClass($cls),
+                'notifications_enabled' => true,
             ]);
 
             Fee::firstOrCreate(
@@ -89,7 +101,7 @@ class StudentController extends Controller
             Alert::create([
                 'class_no' => $cls,
                 'section'  => $section,
-                'msg'      => "New student registered: {$student->name} (Class {$cls}-{$section}) — ID {$student->student_id}",
+                'msg'      => "New student registered: {$student->name} ({$student->display_class}) — ID {$student->student_id}",
             ]);
 
             DB::commit();

@@ -71,36 +71,33 @@
 @php
     $avatar = 'https://api.dicebear.com/8.x/initials/svg?seed=' . urlencode($student->avatar_seed ?: $student->name);
     $qr = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($student->student_id);
+    $cls = method_exists($student, 'getDisplayClassAttribute') ? $student->display_class : 'Class '.$student->class_no.'-'.$student->section;
 @endphp
 
 <div class="id-card">
   <div class="id-head">
-    <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
-    <div>
-      <div class="school">StudentHub</div>
-      <div class="sub">Student ID Card</div>
-    </div>
+    <div class="logo-circle"><i class="fa-solid fa-graduation-cap"></i></div>
+    <h1>IRAA</h1>
+    <p>Iqra Riffat ull Atfal Academy</p>
   </div>
-
+  <div class="photo-wrap">
+    <div class="photo"><img src="{{ $avatar }}" alt=""></div>
+  </div>
   <div class="id-body">
-    <img class="id-photo" src="{{ $avatar }}" alt="student" />
-    <div class="flex-grow-1">
-      <div class="id-name">{{ $student->name }}</div>
-      <div class="id-role">Class {{ $student->class_no }}-{{ $student->section }} • {{ $student->batch }}</div>
-      <span class="chip">{{ $student->student_id }}</span>
-      <div class="id-row mt-2"><span class="text-muted">Father:</span> <b>{{ $student->father_name ?: '—' }}</b></div>
-      <div class="id-row"><span class="text-muted">Phone:</span> <b>{{ $student->phone ?: '—' }}</b></div>
+    <div class="name">{{ $student->name }}</div>
+    <div class="id-badge">STUDENT ID • {{ $student->student_id }}</div>
+    <div class="details">
+      <div class="detail-row"><span>Father Name</span><b>{{ $student->father_name ?: '—' }}</b></div>
+      <div class="detail-row"><span>Class</span><b>{{ $cls }}</b></div>
+      <div class="detail-row"><span>WhatsApp/Phone</span><b>{{ $student->whatsapp ?: $student->phone ?: '—' }}</b></div>
+      <div class="detail-row"><span>Address</span><b style="text-align:right;max-width:160px;">{{ $student->address ?: '—' }}</b></div>
+    </div>
+    <div class="qr-wrap">
+      <div class="qr"><img src="{{ $qr }}" alt=""></div>
+      <small style="color:#475569;">Scan for attendance</small>
     </div>
   </div>
-
-  <div class="id-foot">
-    <div class="tiny">
-      <b style="color:#0b1220;">{{ $student->student_id }}</b><br />
-      Valid: Session {{ date('Y') }}<br />
-      Attendance scan ke liye QR
-    </div>
-    <img class="qr" src="{{ $qr }}" alt="QR" />
-  </div>
+  <div class="id-foot">Yeh card hamesha saath rakhein</div>
 </div>
 
 <div class="actions">

@@ -40,7 +40,7 @@
               </div>
             </td>
             <td><span class="badge bg-soft-primary">{{ $s->student_id }}</span></td>
-            <td>Class {{ $s->class_no }}-{{ $s->section }}</td>
+            <td>{{ method_exists($s, 'getDisplayClassAttribute') ? $s->display_class : 'Class '.$s->class_no.'-'.$s->section }}</td>
             <td>{{ $s->phone ?: '—' }}</td>
             <td>
               <span class="badge {{ $s->status === 'Active' ? 'bg-soft-success' : 'bg-soft-danger' }}">{{ $s->status }}</span>
@@ -71,15 +71,29 @@
         <div class="row g-3">
           <div class="col-md-6"><label class="muted" style="font-size:12px;">Full Name *</label><input class="form-ctrl" name="name" required /></div>
           <div class="col-md-6"><label class="muted" style="font-size:12px;">Father Name</label><input class="form-ctrl" name="father_name" /></div>
-          <div class="col-md-4"><label class="muted" style="font-size:12px;">Class *</label>
-            <select class="form-ctrl" name="class_no" required>
-              @for($i = 1; $i <= 12; $i++)<option value="{{ $i }}" {{ $i === 6 ? 'selected' : '' }}>Class {{ $i }}</option>@endfor
+          <div class="col-md-4">
+            <label class="muted" style="font-size:12px;">Type *</label>
+            <select class="form-ctrl" name="stream" id="addStream" required>
+              <option value="school" selected>School</option>
+              <option value="madarsa">Madarsa</option>
+              <option value="both">School + Madarsa</option>
             </select>
           </div>
-          <div class="col-md-4"><label class="muted" style="font-size:12px;">Section *</label>
+          <div class="col-md-4" id="addClassWrap">
+            <label class="muted" style="font-size:12px;">Class *</label>
+            <select class="form-ctrl" name="class_no">
+              @for($i = 1; $i <= 8; $i++)<option value="{{ $i }}" {{ $i === 6 ? 'selected' : '' }}>Class {{ $i }}</option>@endfor
+            </select>
+          </div>
+          <div class="col-md-4" id="addMadarsaWrap" style="display:none;">
+            <label class="muted" style="font-size:12px;">Madarsa Section *</label>
+            <select class="form-ctrl" name="madarsa_section">@foreach(['A','B','C','D'] as $sec)<option>{{ $sec }}</option>@endforeach</select>
+          </div>
+          <div class="col-md-4"><label class="muted" style="font-size:12px;">Section (old)</label>
             <select class="form-ctrl" name="section">@foreach(['A','B','C','D'] as $sec)<option>{{ $sec }}</option>@endforeach</select>
           </div>
-          <div class="col-md-4"><label class="muted" style="font-size:12px;">Phone</label><input class="form-ctrl" name="phone" /></div>
+          <div class="col-md-4"><label class="muted" style="font-size:12px;">WhatsApp / Phone</label><input class="form-ctrl" name="phone" placeholder="03XXXXXXXXX" /></div>
+          <div class="col-md-4"><label class="muted" style="font-size:12px;">Monthly Fee *</label><input class="form-ctrl" type="number" name="monthly_fee" value="2500" required /></div>
           <div class="col-md-6"><label class="muted" style="font-size:12px;">Email (alerts ke liye)</label><input class="form-ctrl" type="email" name="email" /></div>
           <div class="col-md-6"><label class="muted" style="font-size:12px;">Address</label><input class="form-ctrl" name="address" /></div>
           <div class="col-12"><label class="muted" style="font-size:12px;">Password (khaali chhoda to apne aap "name123" banega)</label><input class="form-ctrl" name="password" placeholder="auto generate" /></div>
@@ -93,6 +107,16 @@
     </form>
   </div>
 </div>
+
+<script>
+document.getElementById('addStream')?.addEventListener('change', function(){
+  const v = this.value;
+  const cw = document.getElementById('addClassWrap');
+  const mw = document.getElementById('addMadarsaWrap');
+  if(cw) cw.style.display = (v === 'madarsa') ? 'none' : '';
+  if(mw) mw.style.display = (v === 'school') ? 'none' : '';
+});
+</script>
 
 {{-- ===== EDIT MODALS ===== --}}
 @foreach($students as $s)

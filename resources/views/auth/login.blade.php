@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'StudentHub — Login')
+@section('title', 'IRAA — Login')
 
 @section('content')
 <div class="login-wrap">
@@ -13,9 +13,9 @@
     <div class="login-brand anim-fade-up">
       <div class="brand-badge">
         <div class="brand-logo"><i class="fa-solid fa-graduation-cap"></i></div>
-        StudentHub
+        IRAA
       </div>
-      <h1>Student Management &amp;<br /><span>QR Attendance System</span></h1>
+      <h1>Iqra Riffat ull Atfal Academy<br /><span>School + Madarsa Management System</span></h1>
 
       <ul class="features-list">
         <li><i class="fa-solid fa-id-card"></i> Auto Student ID + Unique QR Code</li>

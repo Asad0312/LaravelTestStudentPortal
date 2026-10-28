@@ -1,12 +1,15 @@
 <?php
 
 use App\Http\Controllers\Admin\AttendanceController;
+use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\ExportController;
 use App\Http\Controllers\Admin\FeeController;
 use App\Http\Controllers\Admin\LookupController;
 use App\Http\Controllers\Admin\MarkController;
 use App\Http\Controllers\Admin\MessageController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\AdmissionController as AdminAdmissionController;
 use App\Http\Controllers\Admin\TestController;
@@ -21,7 +24,7 @@ Route::get('/login', [AuthController::class, 'show'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-/* ---------------- Student portal (mobile safe — kabhi admin panel nahi) ---------------- */
+/* ---------------- Student portal ---------------- */
 Route::prefix('portal')->middleware('student')->name('portal.')->group(function () {
     Route::get('/', [PortalController::class, 'show'])->name('show');
     Route::get('/id-card', [PortalController::class, 'idCard'])->name('id-card');
@@ -61,6 +64,17 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
     Route::get('fees', [FeeController::class, 'index'])->name('fees.index');
     Route::post('fees/payment', [FeeController::class, 'addPayment'])->name('fees.payment');
+
+    Route::get('exams', [ExamController::class, 'index'])->name('exams.index');
+    Route::post('exams', [ExamController::class, 'store'])->name('exams.store');
+    Route::post('exams/collect', [ExamController::class, 'collect'])->name('exams.collect');
+
+    Route::get('books', [BookController::class, 'index'])->name('books.index');
+    Route::post('books/save', [BookController::class, 'save'])->name('books.save');
+    Route::get('books/templates', [BookController::class, 'templates'])->name('books.templates');
+
+    Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
 
     Route::get('admissions', [AdminAdmissionController::class, 'index'])->name('admissions.index');
     Route::post('admissions', [AdminAdmissionController::class, 'store'])->name('admissions.store');

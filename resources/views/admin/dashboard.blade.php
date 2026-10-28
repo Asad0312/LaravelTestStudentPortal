@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('page_title', 'Dashboard')
-@section('page_sub', 'School overview — ' . date('l, j F Y'))
+@section('page_sub', 'IRAA overview — ' . date('l, j F Y'))
 
 @section('content')
 <div class="row g-3 mb-4">

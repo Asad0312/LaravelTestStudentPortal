@@ -32,16 +32,25 @@ return new class extends Migration
             $table->string('name', 150);
             $table->string('father_name', 150)->default('');
             $table->string('phone', 40)->default('');
+            $table->string('whatsapp', 40)->default('')->nullable();
             $table->string('email', 190)->default('');
             $table->string('address', 255)->default('');
+            $table->enum('stream', ['school', 'madarsa', 'both'])->default('school');
+            $table->unsignedTinyInteger('class_level')->nullable();
+            $table->char('madarsa_section', 1)->nullable();
             $table->unsignedTinyInteger('class_no')->default(6);
             $table->string('section', 8)->default('A');
             $table->string('batch', 40)->default('Session 2026');
             $table->date('admission_date');
             $table->string('status', 20)->default('Active');
             $table->string('password');
+            $table->decimal('monthly_fee', 10, 2)->default(2500);
+            $table->boolean('notifications_enabled')->default(true);
+            $table->text('notes')->nullable();
             $table->string('avatar_seed', 150)->default('');
             $table->timestamps();
+            $table->softDeletes();
+            $table->index(['stream', 'class_level', 'madarsa_section']);
             $table->index(['class_no', 'section']);
         });
 
@@ -75,7 +84,13 @@ return new class extends Migration
             $table->unsignedInteger('amount');
             $table->date('paid_on');
             $table->string('method', 40)->default('Cash');
+            $table->unsignedInteger('fine_amount')->default(0);
+            $table->unsignedBigInteger('received_by')->nullable();
+            $table->text('note')->nullable();
+            $table->timestamp('edited_at')->nullable();
+            $table->unsignedBigInteger('edited_by')->nullable();
             $table->timestamps();
+            $table->softDeletes();
             $table->index('student_id');
         });
 
