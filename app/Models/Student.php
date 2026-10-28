@@ -91,14 +91,14 @@ class Student extends Model
         return $num;
     }
 
-    /** Next auto ID: STU-1001 style. */
+    /** Next auto ID: STU-1 style. */
     public static function nextStudentId(): string
     {
-        $max = (int) static::query()
+        $max = (int) static::withTrashed()
             ->selectRaw('MAX(' . Sql::numericSuffix('student_id') . ') as m')
             ->value('m');
-        if ($max < 1000) {
-            $max = 1000;
+        if ($max < 1) {
+            $max = 0;
         }
 
         return 'STU-' . ($max + 1);

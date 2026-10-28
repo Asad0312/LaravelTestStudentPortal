@@ -24,7 +24,7 @@
     <table class="table table-hover align-middle">
       <thead>
         <tr>
-          <th>Student</th><th>ID</th><th>Class</th><th>Phone</th><th>Status</th><th class="text-end">Actions</th>
+          <th>Student</th><th>ID</th><th>Class/Section</th><th>Phone</th><th>Status</th><th class="text-end">Actions</th>
         </tr>
       </thead>
       <tbody>

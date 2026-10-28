@@ -65,7 +65,7 @@ class FeeController extends Controller
         DB::transaction(function () use ($student, $month, $amount, $data) {
             $fee = Fee::firstOrCreate(
                 ['student_id' => $student->id, 'month' => $month],
-                ['monthly_amount' => Student::defaultFeeForClass((int) $student->class_no), 'paid_amount' => 0]
+                ['monthly_amount' => (int) ($student->monthly_fee ?? Student::defaultFeeForClass((int) ($student->class_level ?? $student->class_no))), 'paid_amount' => 0]
             );
 
             $fee->update([

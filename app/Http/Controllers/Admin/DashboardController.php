@@ -28,7 +28,7 @@ class DashboardController extends Controller
         $billed    = (int) ($feeAgg->billed ?? 0);
         $collected = (int) ($feeAgg->collected ?? 0);
 
-        $byClass = Student::selectRaw('class_no, COUNT(*) as total')
+        $byClass = Student::selectRaw('COALESCE(class_level, class_no) as class_no, COUNT(*) as total')
             ->groupBy('class_no')
             ->orderBy('class_no')
             ->get();
