@@ -28,10 +28,17 @@ class DashboardController extends Controller
         $billed    = (int) ($feeAgg->billed ?? 0);
         $collected = (int) ($feeAgg->collected ?? 0);
 
-        $byClass = Student::selectRaw('COALESCE(class_level, class_no) as class_no, COUNT(*) as total')
-            ->groupBy('class_no')
-            ->orderBy('class_no')
-            ->get();
+        try {
+            $byClass = Student::selectRaw('COALESCE(class_level, class_no) as class_no, COUNT(*) as total')
+                ->groupBy('class_no')
+                ->orderBy('class_no')
+                ->get();
+        } catch (\Throwable $e) {
+            $byClass = Student::selectRaw('class_no, COUNT(*) as total')
+                ->groupBy('class_no')
+                ->orderBy('class_no')
+                ->get();
+        }
 
         $recentAlerts = Alert::latest('id')->limit(6)->get();
         $recentPayments = Payment::with('student')->latest('id')->limit(5)->get();
