@@ -92,7 +92,11 @@ class Student extends Model
     /** Next auto ID: STU-1 style. */
     public static function nextStudentId(): string
     {
-        $max = (int) static::withTrashed()
+        $query = static::query();
+        if (method_exists(static::class, 'bootSoftDeletes')) {
+            $query = $query->withTrashed();
+        }
+        $max = (int) $query
             ->selectRaw('MAX(' . Sql::numericSuffix('student_id') . ') as m')
             ->value('m');
         if ($max < 1) {
