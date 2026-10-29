@@ -95,7 +95,7 @@ class StudentController extends Controller
 
             Fee::firstOrCreate(
                 ['student_id' => $student->id, 'month' => date('Y-m')],
-                ['monthly_amount' => Student::defaultFeeForClass($cls), 'paid_amount' => 0]
+                ['monthly_amount' => (int) ($student->monthly_fee ?? Student::defaultFeeForClass($cls)), 'paid_amount' => 0]
             );
 
             Alert::create([

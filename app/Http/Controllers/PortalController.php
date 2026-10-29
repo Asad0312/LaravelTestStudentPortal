@@ -38,7 +38,11 @@ class PortalController extends Controller
 
         /* fee */
         $feeRow = $student->fees()->orderByDesc('month')->first();
-        $monthly = (int) ($feeRow->monthly_amount ?? $student->monthly_fee ?? 0);
+        if ($feeRow && $student->monthly_fee && (int)$feeRow->monthly_amount !== (int)$student->monthly_fee) {
+            $feeRow->monthly_amount = (int)$student->monthly_fee;
+            $feeRow->save();
+        }
+        $monthly = (int) ($feeRow->monthly_amount ?? $student->monthly_fee ?? Student::defaultFeeForClass((int) ($student->class_level ?? $student->class_no)));
         $paid    = (int) ($feeRow->paid_amount ?? 0);
         $rem     = max(0, $monthly - $paid);
         $feeStatus = $rem <= 0 ? 'Paid' : ($paid > 0 ? 'Pending' : 'Unpaid');

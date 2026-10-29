@@ -56,7 +56,8 @@
       <div class="modal-body">
         <input type="hidden" name="student_id" value="{{ $r['dbId'] }}" />
         <div class="mb-2"><label class="muted" style="font-size:12px;">Month *</label><input class="form-ctrl" type="month" name="month" value="{{ date('Y-m') }}" required /></div>
-        <div class="mb-2"><label class="muted" style="font-size:12px;">Amount *</label><input class="form-ctrl" type="number" name="amount" min="1" value="{{ max(1, $r['remaining']) }}" required /></div>
+        <div class="mb-2"><label class="muted" style="font-size:12px;">Monthly Fee (Edit if needed)</label><input class="form-ctrl" type="number" name="monthly_amount" min="0" value="{{ $r['monthly'] }}" /></div>
+        <div class="mb-2"><label class="muted" style="font-size:12px;">Amount Paid *</label><input class="form-ctrl" type="number" name="amount" min="1" value="{{ max(1, $r['remaining']) }}" required /></div>
         <div><label class="muted" style="font-size:12px;">Method *</label>
           <select class="form-ctrl" name="method"><option>Cash</option><option>JazzCash</option><option>Easypaisa</option><option>Bank Transfer</option></select>
         </div>

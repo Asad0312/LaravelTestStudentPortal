@@ -18,6 +18,10 @@ class FeeController extends Controller
             ->get()
             ->map(function (Student $s) {
                 $fee = $s->fees()->orderByDesc('month')->first();
+                if ($fee && $s->monthly_fee && (int)$fee->monthly_amount !== (int)$s->monthly_fee) {
+                    $fee->monthly_amount = (int)$s->monthly_fee;
+                    $fee->save();
+                }
 
                 $monthly = (int) ($fee->monthly_amount ?? $s->monthly_fee ?? Student::defaultFeeForClass((int) ($s->class_level ?? $s->class_no)));
                 $paid    = (int) ($fee->paid_amount ?? 0);
@@ -56,20 +60,29 @@ class FeeController extends Controller
             'month'      => ['required', 'string', 'max:7'],
             'amount'     => ['required', 'integer', 'min:1'],
             'method'     => ['required', 'string', 'max:40'],
+            'monthly_amount' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $student = Student::findOrFail($data['student_id']);
         $month   = substr($data['month'], 0, 7);
         $amount  = (int) $data['amount'];
+        $monthlyAmt = array_key_exists('monthly_amount', $data) && $data['monthly_amount'] !== null && $data['monthly_amount'] !== ''
+            ? (int) $data['monthly_amount']
+            : (int) ($student->monthly_fee ?? Student::defaultFeeForClass((int) ($student->class_level ?? $student->class_no)));
 
-        DB::transaction(function () use ($student, $month, $amount, $data) {
+        DB::transaction(function () use ($student, $month, $amount, $data, $monthlyAmt) {
             $fee = Fee::firstOrCreate(
                 ['student_id' => $student->id, 'month' => $month],
-                ['monthly_amount' => (int) ($student->monthly_fee ?? Student::defaultFeeForClass((int) ($student->class_level ?? $student->class_no))), 'paid_amount' => 0]
+                ['monthly_amount' => $monthlyAmt, 'paid_amount' => 0]
             );
 
+            if ((int) $fee->monthly_amount !== $monthlyAmt) {
+                $fee->monthly_amount = $monthlyAmt;
+            }
+
             $fee->update([
-                'paid_amount' => min((int) $fee->monthly_amount, (int) $fee->paid_amount + $amount),
+                'monthly_amount' => $monthlyAmt,
+                'paid_amount' => min($monthlyAmt, (int) $fee->paid_amount + $amount),
             ]);
 
             Payment::create([
