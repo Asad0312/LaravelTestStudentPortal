@@ -26,7 +26,8 @@
       <div class="col-md-4" id="admClassWrap">
         <label class="muted" style="font-size:12px;">Class *</label>
         <select class="form-ctrl" name="class_no">
-          @for($i = 1; $i <= 8; $i++)<option value="{{ $i }}" {{ $i === 6 ? 'selected' : '' }}>Class {{ $i }}</option>@endfor
+          <option value="" disabled selected>Select Class</option>
+          @for($i = 1; $i <= 8; $i++)<option value="{{ $i }}">Class {{ $i }}</option>@endfor
         </select>
       </div>
       <div class="col-md-4" id="admMadarsaWrap" style="display:none;">

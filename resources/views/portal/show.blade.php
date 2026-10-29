@@ -5,7 +5,7 @@
 @section('content')
 @php
     $avatar   = 'https://api.dicebear.com/8.x/initials/svg?seed=' . urlencode($student->avatar_seed ?: $student->name);
-    $clsLabel = 'Class ' . $student->class_no . '-' . $student->section;
+    $clsLabel = method_exists($student, 'getDisplayClassAttribute') ? $student->display_class : ('Class ' . ($student->class_level ?? $student->class_no) . '-' . ($student->madarsa_section ?? $student->section));
     $today    = now()->toDateString();
     $feeBars  = $fee['status'] === 'Paid'
         ? 'var(--gradient-success)'

@@ -128,26 +128,52 @@ class StudentController extends Controller
         }
 
         $data = $request->validate([
-            'name'        => ['required', 'string', 'max:150'],
-            'father_name' => ['nullable', 'string', 'max:150'],
-            'phone'       => ['nullable', 'string', 'max:40'],
-            'email'       => ['nullable', 'email', 'max:190'],
-            'address'     => ['nullable', 'string', 'max:255'],
-            'class_no'    => ['required', 'integer', 'between:1,12'],
-            'section'     => ['required', 'string', 'max:8'],
-            'status'      => ['nullable', 'string', 'max:20'],
+            'name'           => ['required', 'string', 'max:150'],
+            'father_name'    => ['nullable', 'string', 'max:150'],
+            'phone'          => ['nullable', 'string', 'max:40'],
+            'email'          => ['nullable', 'email', 'max:190'],
+            'address'        => ['nullable', 'string', 'max:255'],
+            'stream'         => ['nullable', 'in:school,madarsa,both'],
+            'class_level'    => ['nullable', 'integer', 'between:1,8'],
+            'class_no'       => ['nullable', 'integer', 'between:1,12'],
+            'madarsa_section'=> ['nullable', 'string', 'max:1'],
+            'section'        => ['nullable', 'string', 'max:8'],
+            'batch'          => ['nullable', 'string', 'max:40'],
+            'status'         => ['nullable', 'string', 'max:20'],
+            'password'       => ['nullable', 'string', 'min:4', 'max:60'],
+            'monthly_fee'    => ['nullable', 'numeric', 'min:0'],
         ]);
 
-        $student->update([
-            'name'        => $data['name'],
-            'father_name' => (string) ($data['father_name'] ?? ''),
-            'phone'       => (string) ($data['phone'] ?? ''),
-            'email'       => (string) ($data['email'] ?? ''),
-            'address'     => (string) ($data['address'] ?? ''),
-            'class_no'    => (int) $data['class_no'],
-            'section'     => $data['section'],
-            'status'      => $data['status'] ?? 'Active',
-        ]);
+        $stream = $data['stream'] ?? $student->stream ?? 'school';
+        $cls    = (int) ($data['class_level'] ?? $data['class_no'] ?? $student->class_level ?? $student->class_no ?? 6);
+        $msec   = strtoupper($data['madarsa_section'] ?? $data['section'] ?? $student->madarsa_section ?? $student->section ?? 'A');
+
+        $update = [
+            'name'           => $data['name'],
+            'father_name'    => (string) ($data['father_name'] ?? ''),
+            'phone'          => (string) ($data['phone'] ?? ''),
+            'whatsapp'       => (string) ($data['phone'] ?? $student->whatsapp ?? ''),
+            'email'          => (string) ($data['email'] ?? ''),
+            'address'        => (string) ($data['address'] ?? ''),
+            'stream'         => $stream,
+            'class_level'    => $stream === 'madarsa' ? null : $cls,
+            'madarsa_section'=> $stream === 'school' ? null : $msec,
+            'class_no'       => $cls,
+            'section'        => $msec,
+            'batch'          => (string) ($data['batch'] ?? $student->batch ?? ('Session ' . date('Y'))),
+            'status'         => $data['status'] ?? $student->status ?? 'Active',
+            'avatar_seed'    => $data['name'],
+        ];
+
+        if (array_key_exists('monthly_fee', $data) && $data['monthly_fee'] !== null && $data['monthly_fee'] !== '') {
+            $update['monthly_fee'] = (float) $data['monthly_fee'];
+        }
+
+        if (!empty($data['password'])) {
+            $update['password'] = Hash::make($data['password']);
+        }
+
+        $student->update($update);
 
         return back()->with('success', $student->name . ' update ho gaya.');
     }
