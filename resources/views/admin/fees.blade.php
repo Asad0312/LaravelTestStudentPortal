@@ -35,6 +35,7 @@
             <td class="{{ $r['remaining'] > 0 ? 'text-danger' : '' }}">Rs. {{ number_format($r['remaining']) }}</td>
             <td><span class="badge {{ $r['status'] === 'Paid' ? 'bg-soft-success' : ($r['status'] === 'Pending' ? 'bg-soft-warning' : 'bg-soft-danger') }}">{{ $r['status'] }}</span></td>
             <td class="text-end">
+              <a class="btn btn-sm btn-outline-primary" target="_blank" href="{{ route('admin.fees.slip', [$r['dbId'], date('Y-m')]) }}"><i class="fa-solid fa-print"></i> Print Slip</a>
               <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#payModal{{ $r['dbId'] }}"><i class="fa-solid fa-plus"></i> Payment</button>
             </td>
           </tr>

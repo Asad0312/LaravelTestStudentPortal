@@ -39,7 +39,7 @@
         <div class="col-6">
           <div class="stat-pill text-center">
             <div class="fs-4 fw-bold">{{ $fee['status'] }}</div>
-            <div class="small opacity-75">Fee Status</div>
+            <div class="small opacity-75">{{ $fee['month'] }}</div>
           </div>
         </div>
       </div>
@@ -206,13 +206,39 @@
     </div>
   </div>
 
+  {{-- Exam Fees --}}
+  @if(isset($examFees) && $examFees->count())
+  <div class="card card-soft p-4 mt-3 anim-fade-up d2">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+      <h5 class="section-title mb-0"><i class="fa-solid fa-file-invoice-dollar me-2 text-primary"></i>Examination Fees</h5>
+      <span class="badge bg-soft-info" style="font-size:11px;">{{ $examFees->count() }} Exam(s)</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead><tr><th>Exam</th><th>Month</th><th>Amount</th><th>Status</th><th>Paid On</th></tr></thead>
+        <tbody>
+          @foreach($examFees as $ef)
+            <tr>
+              <td><b>{{ $ef->event->title ?? 'Exam' }}</b></td>
+              <td>{{ $ef->event && $ef->event->exam_month ? $ef->event->exam_month->format('M Y') : '—' }}</td>
+              <td>Rs. {{ number_format($ef->amount) }}</td>
+              <td><span class="badge {{ $ef->status === 'paid' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' }}">{{ ucfirst($ef->status) }}</span></td>
+              <td>{{ $ef->paid_on ? $ef->paid_on->format('d-M-Y') : '—' }}</td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+  </div>
+  @endif
+
   {{-- Test alerts --}}
   <div class="card card-soft p-4 mt-3 anim-fade-up d2">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
       <h5 class="section-title mb-0"><i class="fa-solid fa-bell me-2 text-warning"></i>Test Alerts</h5>
       <span class="badge bg-soft-warning" style="font-size:11px;">Naye alerts yahan aate hain</span>
     </div>
-    <p class="muted small mb-3" style="line-height:1.6;">Admin jab bhi koi test ya marks upload karta hai, is class ke har student ko yahan alert aa jata hai — saath hi email bhi jata hai.</p>
+    <p class="muted small mb-3" style="line-height:1.6;">Admin jab bhi koi test ya marks upload karta hai, tumhe yahan alert aa jata hai.</p>
     @if($alerts->isEmpty())
       <div class="muted small py-2"><i class="fa-solid fa-inbox me-1"></i>Abhi koi alert nahi.</div>
     @else

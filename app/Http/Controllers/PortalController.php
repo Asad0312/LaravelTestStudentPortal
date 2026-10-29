@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Admission;
 use App\Models\Alert;
 use App\Models\Attendance;
+use App\Models\ExamFee;
 use App\Models\Fee;
 use App\Models\Mark;
 use App\Models\Message;
@@ -37,17 +38,28 @@ class PortalController extends Controller
 
         /* fee */
         $feeRow = $student->fees()->orderByDesc('month')->first();
-        $monthly = (int) ($feeRow->monthly_amount ?? 0);
+        $monthly = (int) ($feeRow->monthly_amount ?? $student->monthly_fee ?? 0);
         $paid    = (int) ($feeRow->paid_amount ?? 0);
         $rem     = max(0, $monthly - $paid);
         $feeStatus = $rem <= 0 ? 'Paid' : ($paid > 0 ? 'Pending' : 'Unpaid');
         $feePct    = $monthly > 0 ? round(($paid / $monthly) * 100) : 0;
 
         /* academics */
-        $tests = Test::where('class_no', $student->class_no)
-            ->where('section', $student->section)
-            ->orderBy('test_date')
-            ->get();
+        $stream = $student->stream ?? 'school';
+        $sCls = $student->class_level ?? $student->class_no;
+        $sSec = strtoupper($student->madarsa_section ?? $student->section ?? 'A');
+
+        $tests = Test::where(function($q) use ($stream, $sCls, $sSec) {
+            if ($stream === 'school') {
+                $q->where(function($qq) use ($sCls){ $qq->where('stream','school')->orWhere('stream','both'); });
+                $q->where(function($qq) use ($sCls){ $qq->whereNull('class_level')->orWhere('class_level', $sCls); });
+            } elseif ($stream === 'madarsa') {
+                $q->where(function($qq){ $qq->where('stream','madarsa')->orWhere('stream','both'); });
+                $q->where(function($qq) use ($sSec){ $qq->whereNull('madarsa_section')->orWhere('madarsa_section', $sSec); });
+            } else { // both
+                $q->where('stream','both');
+            }
+        })->orderBy('test_date')->get();
 
         $marks = Mark::with('test')
             ->where('student_id', $student->id)
@@ -78,6 +90,8 @@ class PortalController extends Controller
 
         $messages = Message::forStudent($student)->orderByDesc('id')->limit(10)->get();
 
+        $examFees = ExamFee::with('event')->where('student_id', $student->id)->orderByDesc('id')->get();
+
         $classInfo = SchoolClass::where('class_no', $student->class_no)
             ->where('section', $student->section)
             ->first()
@@ -96,7 +110,7 @@ class PortalController extends Controller
                 'paid'      => $paid,
                 'remaining' => $rem,
                 'status'    => $feeStatus,
-                'month'     => $feeRow ? date('F Y', strtotime($feeRow->month . '-01')) : '—',
+                'month'     => $feeRow ? date('F Y', strtotime($feeRow->month . '-01')) : date('F Y'),
                 'pct'       => $feePct,
             ],
             'payments' => $payments,
@@ -104,6 +118,7 @@ class PortalController extends Controller
             'marks'    => $marks,
             'alerts'   => $alerts,
             'messages' => $messages,
+            'examFees' => $examFees,
             'classInfo'=> $classInfo,
             'syncStamp'=> $this->syncStamp($student),
         ]);

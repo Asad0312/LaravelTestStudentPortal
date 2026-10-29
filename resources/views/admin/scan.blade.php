@@ -73,15 +73,15 @@
 
   function show(ok, data) {
     box.style.display = 'block';
-    const cls = ok ? 'flash flash-ok' : 'flash flash-err';
-    const icon = ok ? 'fa-circle-check' : 'fa-circle-xmark';
+    const cls = ok ? (data.already ? 'flash flash-warn' : (data.updated ? 'flash flash-info' : 'flash flash-ok')) : 'flash flash-err';
+    const icon = ok ? (data.already ? 'fa-circle-exclamation' : (data.updated ? 'fa-arrows-rotate' : 'fa-circle-check')) : 'fa-circle-xmark';
     if (ok) {
       inner.innerHTML =
-        '<div class="' + cls + '"><i class="fa-solid ' + icon + '"></i> <b>' + data.name + '</b> (' + data.student_id +
-        ') — ' + data.class + ' • ' + data.time + (data.already ? ' (pehle se Present)' : '') + '</div>';
-      prependScan(data);
+        '<div class="' + cls + '"><i class="fa-solid ' + icon + '"></i> <div><b>' + data.name + '</b> (' + data.student_id +
+        ') — ' + data.class + ' • ' + data.time + '<div style="font-size:12px;margin-top:2px;">' + (data.message||'') + '</div></div></div>';
+      if(!data.already){ prependScan(data); }
     } else {
-      inner.innerHTML = '<div class="' + cls + '"><i class="fa-solid ' + icon + '"></i> ' + data.error + '</div>';
+      inner.innerHTML = '<div class="' + cls + '"><i class="fa-solid ' + icon + '"></i> ' + (data.error||'Error') + '</div>';
     }
   }
 

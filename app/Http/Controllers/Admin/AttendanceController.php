@@ -54,12 +54,17 @@ class AttendanceController extends Controller
             ->first();
 
         if ($exists) {
+            $was = $exists->status;
             $exists->update([
                 'status'      => $data['status'],
-                'check_in_at' => now()->format('H:i:s'),
+                'check_in_at' => $data['status'] === 'Present' ? now()->format('H:i:s') : $exists->check_in_at,
             ]);
 
-            return back()->with('success', $student->name . ' — ' . $data['status'] . ' (update ho gaya)');
+            if ($was === $data['status']) {
+                return back()->with('warning', $student->name . ' (' . $student->student_id . ') — aaj pehle se ' . $data['status'] . ' mark hai.');
+            }
+
+            return back()->with('success', $student->name . ' (' . $student->student_id . ') — ' . $was . ' se ' . $data['status'] . ' me update ho gaya.');
         }
 
         Attendance::create([
@@ -70,7 +75,7 @@ class AttendanceController extends Controller
             'source'      => 'manual',
         ]);
 
-        return back()->with('success', $student->name . ' (' . $student->student_id . ') — ' . $data['status']);
+        return back()->with('success', $student->name . ' (' . $student->student_id . ') — ' . $data['status'] . ' mark ho gaya.');
     }
 
     /** QR scan page — camera se ID card scan kar ke attendance. */
@@ -118,8 +123,12 @@ class AttendanceController extends Controller
         if ($row) {
             if ($row->status !== 'Present') {
                 $row->update(['status' => 'Present', 'check_in_at' => $time, 'source' => 'qr']);
+                $already = false;
+                $updated = true;
+            } else {
+                $already = true;
+                $updated = false;
             }
-            $already = true;
         } else {
             Attendance::create([
                 'student_id'  => $student->id,
@@ -129,18 +138,22 @@ class AttendanceController extends Controller
                 'source'      => 'qr',
             ]);
             $already = false;
+            $updated = false;
         }
+
+        $cls = method_exists($student, 'getDisplayClassAttribute') ? $student->display_class : ('Class ' . ($student->class_level ?? $student->class_no) . '-' . ($student->madarsa_section ?? $student->section));
 
         return response()->json([
             'ok'         => true,
             'already'    => $already,
+            'updated'    => $updated ?? false,
             'name'       => $student->name,
             'student_id' => $student->student_id,
-            'class'      => 'Class ' . $student->class_no . '-' . $student->section,
+            'class'      => $cls,
             'time'       => now()->format('h:i A'),
             'message'    => $already
-                ? $student->name . ' aaj pehle se Present tha.'
-                : $student->name . ' — Present mark ho gaya!',
+                ? $student->name . ' (' . $student->student_id . ') — aaj pehle se Present mark hai.'
+                : (($updated ?? false) ? $student->name . ' (' . $student->student_id . ') — Absent se Present me update ho gaya.' : $student->name . ' (' . $student->student_id . ') — Present mark ho gaya!'),
         ]);
     }
 }

@@ -19,7 +19,7 @@ class FeeController extends Controller
             ->map(function (Student $s) {
                 $fee = $s->fees()->orderByDesc('month')->first();
 
-                $monthly = (int) ($fee->monthly_amount ?? 0);
+                $monthly = (int) ($fee->monthly_amount ?? $s->monthly_fee ?? Student::defaultFeeForClass((int) ($s->class_level ?? $s->class_no)));
                 $paid    = (int) ($fee->paid_amount ?? 0);
                 $rem     = max(0, $monthly - $paid);
 
@@ -27,13 +27,13 @@ class FeeController extends Controller
                     'dbId'      => $s->id,
                     'studentId' => $s->student_id,
                     'name'      => $s->name,
-                    'cls'       => 'Class ' . $s->class_no . '-' . $s->section,
+                    'cls'       => method_exists($s, 'getDisplayClassAttribute') ? $s->display_class : ('Class ' . ($s->class_level ?? $s->class_no) . '-' . ($s->madarsa_section ?? $s->section)),
                     'avatar'    => $s->avatar_seed,
                     'monthly'   => $monthly,
                     'paid'      => $paid,
                     'remaining' => $rem,
                     'status'    => $rem <= 0 ? 'Paid' : ($paid > 0 ? 'Pending' : 'Unpaid'),
-                    'month'     => $fee ? date('F Y', strtotime($fee->month . '-01')) : '—',
+                    'month'     => $fee ? date('F Y', strtotime($fee->month . '-01')) : date('F Y'),
                 ];
             });
 
@@ -82,5 +82,25 @@ class FeeController extends Controller
         });
 
         return back()->with('success', 'Payment saved: ' . $student->name . ' — Rs. ' . number_format($amount));
+    }
+
+    public function slip(Request $request, int $studentId, string $month)
+    {
+        $student = Student::findOrFail($studentId);
+        $month = substr($month, 0, 7);
+        $fee = Fee::where('student_id', $student->id)->where('month', $month)->first();
+        $monthly = (int) ($fee->monthly_amount ?? $student->monthly_fee ?? Student::defaultFeeForClass((int) ($student->class_level ?? $student->class_no)));
+        $paid    = (int) ($fee->paid_amount ?? 0);
+        $rem     = max(0, $monthly - $paid);
+        $payments = Payment::where('student_id', $student->id)->where('month', $month)->orderBy('id')->get();
+
+        return view('admin.fees.slip', [
+            'student'  => $student,
+            'month'    => $month,
+            'monthly'  => $monthly,
+            'paid'     => $paid,
+            'remaining'=> $rem,
+            'payments' => $payments,
+        ]);
     }
 }
