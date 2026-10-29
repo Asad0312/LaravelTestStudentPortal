@@ -72,6 +72,9 @@
           <div class="col-md-4"><label class="muted" style="font-size:12px;">Send to *</label>
             <select class="form-ctrl js-target" name="target">
               <option value="all">All Students</option>
+              <option value="school">Only School</option>
+              <option value="madarsa">Only Madarsa</option>
+              <option value="both">School + Madarsa</option>
               <option value="class">Specific Class</option>
             </select>
           </div>

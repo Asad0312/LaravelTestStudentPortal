@@ -41,9 +41,12 @@
               <tr>
                 <td><b>{{ $e->title }}</b></td>
                 <td>{{ $e->exam_month->format('M Y') }}</td>
-                <td>{{ $e->stream }} @if($e->class_level) | Class {{ $e->class_level }}@endif @if($e->madarsa_section) | Sec {{ $e->madarsa_section }}@endif</td>
+                <td>{{ ucfirst($e->stream) }} @if($e->class_level) | Class {{ $e->class_level }}@endif @if($e->madarsa_section) | Sec {{ $e->madarsa_section }}@endif</td>
                 <td>Rs. {{ number_format($e->exam_fee) }}</td>
-                <td class="text-end"><button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#col{{ $e->id }}"><i class="fa-solid fa-coins"></i> Collect</button></td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#list{{ $e->id }}"><i class="fa-solid fa-list"></i> Fee List</button>
+                  <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#col{{ $e->id }}"><i class="fa-solid fa-coins"></i> Collect</button>
+                </td>
               </tr>
             @empty
               <tr><td colspan="5" class="text-center muted">Koi exam nahi announce hua.</td></tr>
@@ -56,6 +59,54 @@
 </div>
 
 @foreach($events as $e)
+<div class="modal fade" id="list{{ $e->id }}" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h6 class="modal-title fw-bold">{{ $e->title }} — Exam Fee List</h6>
+          <div class="muted" style="font-size:12px;">{{ $e->exam_month->format('F Y') }} • {{ ucfirst($e->stream) }} @if($e->class_level) | Class {{ $e->class_level }}@endif @if($e->madarsa_section) | Sec {{ $e->madarsa_section }}@endif • Fee: Rs. {{ number_format($e->exam_fee) }}</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light"><tr><th>Student ID</th><th>Student</th><th>Class</th><th>Amount</th><th>Status</th><th>Paid On</th><th class="text-end">Action</th></tr></thead>
+            <tbody>
+              @forelse($e->fees->sortBy(function($f){ return $f->student ? $f->student->student_id : ''; }) as $fee)
+                <tr>
+                  <td><span class="badge bg-light text-dark">{{ $fee->student->student_id ?? '—' }}</span></td>
+                  <td><b>{{ $fee->student->name ?? '—' }}</b><div class="muted" style="font-size:11px;">{{ $fee->student->father_name ?? '' }}</div></td>
+                  <td>{{ $fee->student->display_class ?? ($fee->student ? ('Class '.($fee->student->class_level??$fee->student->class_no).'-'.($fee->student->madarsa_section??$fee->student->section)) : '—') }}</td>
+                  <td>Rs. {{ number_format($fee->amount) }}</td>
+                  <td><span class="badge {{ $fee->status === 'paid' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning' }}">{{ ucfirst($fee->status) }}</span></td>
+                  <td>{{ $fee->paid_on ? $fee->paid_on->format('d-M-Y') : '—' }}</td>
+                  <td class="text-end">
+                    @if($fee->status !== 'paid')
+                      <form method="post" action="{{ route('admin.exams.markPaid') }}" class="d-inline">
+                        @csrf
+                        <input type="hidden" name="exam_fee_id" value="{{ $fee->id }}">
+                        <input type="hidden" name="amount" value="{{ $fee->amount }}">
+                        <button class="btn btn-sm btn-success"><i class="fa-solid fa-check me-1"></i>Mark Paid</button>
+                      </form>
+                    @else
+                      <span class="muted" style="font-size:12px;"><i class="fa-solid fa-circle-check text-success"></i> Paid</span>
+                    @endif
+                  </td>
+                </tr>
+              @empty
+                <tr><td colspan="7" class="text-center muted py-3">Koi fee record nahi mila.</td></tr>
+              @endforelse
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-light" data-bs-dismiss="modal">Close</button></div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="col{{ $e->id }}" tabindex="-1">
   <div class="modal-dialog modal-sm">
     <form class="modal-content" method="post" action="{{ route('admin.exams.collect') }}">

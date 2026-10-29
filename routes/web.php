@@ -68,6 +68,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     Route::get('exams', [ExamController::class, 'index'])->name('exams.index');
     Route::post('exams', [ExamController::class, 'store'])->name('exams.store');
     Route::post('exams/collect', [ExamController::class, 'collect'])->name('exams.collect');
+    Route::post('exams/mark-paid', [ExamController::class, 'markPaid'])->name('exams.markPaid');
 
     Route::get('books', [BookController::class, 'index'])->name('books.index');
     Route::post('books/save', [BookController::class, 'save'])->name('books.save');

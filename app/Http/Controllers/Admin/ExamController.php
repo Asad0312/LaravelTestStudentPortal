@@ -13,7 +13,7 @@ class ExamController extends Controller
 {
     public function index()
     {
-        $events = ExamEvent::latest('id')->get();
+        $events = ExamEvent::with(['fees.student'])->latest('id')->get();
         return view('admin.exams', ['events' => $events]);
     }
 
@@ -101,6 +101,25 @@ class ExamController extends Controller
             'received_by' => session('admin_id'),
         ]);
 
-        return back()->with('success', 'Exam fee collected.');
+        return back()->with('success', $student->name . ' ('.$student->student_id.') ka exam fee Rs. '.number_format($data['amount']).' collect ho gaya.');
+    }
+
+    public function markPaid(Request $request)
+    {
+        $data = $request->validate([
+            'exam_fee_id' => ['required', 'exists:exam_fees,id'],
+            'amount' => ['nullable', 'numeric', 'min:0'],
+        ]);
+
+        $fee = ExamFee::with('student','event')->findOrFail($data['exam_fee_id']);
+        $amt = $data['amount'] !== null && $data['amount'] !== '' ? $data['amount'] : $fee->amount;
+        $fee->update([
+            'amount' => $amt,
+            'status' => 'paid',
+            'paid_on' => now()->toDateString(),
+            'received_by' => session('admin_id'),
+        ]);
+
+        return back()->with('success', ($fee->student->name ?? '') . ' ka exam fee paid mark ho gaya.');
     }
 }
