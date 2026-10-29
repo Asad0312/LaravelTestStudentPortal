@@ -206,6 +206,38 @@
     </div>
   </div>
 
+  {{-- Books / Study Material --}}
+  <div class="card card-soft p-4 mt-3 anim-fade-up">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+      <h5 class="section-title mb-0"><i class="fa-solid fa-book me-2 text-primary"></i>Books / Study Material</h5>
+      <span class="badge bg-soft-primary" style="font-size:11px;">{{ isset($books) ? $books->count() : 0 }} Book(s)</span>
+    </div>
+    @if(!isset($books) || $books->isEmpty())
+      <div class="muted small py-2"><i class="fa-solid fa-inbox me-1"></i>Abhi koi book upload nahi hua.</div>
+    @else
+      <div class="row g-2">
+        @foreach($books as $book)
+          <div class="col-md-6">
+            <div class="d-flex align-items-center gap-3 p-2 rounded-3" style="background:#f8fafc;border:1px solid #eef2f7;">
+              <div class="flex-shrink-0" style="width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#0f766e,#22d3ee);color:#fff;display:grid;place-items:center;"><i class="fa-solid fa-book-open"></i></div>
+              <div class="flex-grow-1">
+                <div class="fw-semibold" style="font-size:13.5px;">{{ $book->title }}</div>
+                <div class="muted" style="font-size:11.5px;">
+                  {{ ucfirst($book->stream) }}
+                  @if($book->stream !== 'madarsa' && $book->class_level) | Class {{ $book->class_level }}@endif
+                  @if($book->stream !== 'school' && $book->madarsa_section) | Sec {{ $book->madarsa_section }}@endif
+                </div>
+              </div>
+              @if(!empty($book->file_path))
+                <a class="btn btn-sm btn-outline-primary" href="{{ asset($book->file_path) }}" target="_blank"><i class="fa-solid fa-download"></i></a>
+              @endif
+            </div>
+          </div>
+        @endforeach
+      </div>
+    @endif
+  </div>
+
   {{-- Exam Fees --}}
   @if(isset($examFees) && $examFees->count())
   <div class="card card-soft p-4 mt-3 anim-fade-up d2">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Admission;
 use App\Models\Alert;
 use App\Models\Attendance;
+use App\Models\Book;
 use App\Models\ExamFee;
 use App\Models\Fee;
 use App\Models\Mark;
@@ -41,6 +42,11 @@ class PortalController extends Controller
         if ($feeRow && $student->monthly_fee && (int)$feeRow->monthly_amount !== (int)$student->monthly_fee) {
             $feeRow->monthly_amount = (int)$student->monthly_fee;
             $feeRow->save();
+        } elseif (!$feeRow && $student->monthly_fee) {
+            $feeRow = Fee::firstOrCreate(
+                ['student_id' => $student->id, 'month' => date('Y-m')],
+                ['monthly_amount' => (int)$student->monthly_fee, 'paid_amount' => 0]
+            );
         }
         $monthly = (int) ($feeRow->monthly_amount ?? $student->monthly_fee ?? Student::defaultFeeForClass((int) ($student->class_level ?? $student->class_no)));
         $paid    = (int) ($feeRow->paid_amount ?? 0);
@@ -55,13 +61,13 @@ class PortalController extends Controller
 
         $tests = Test::where(function($q) use ($stream, $sCls, $sSec) {
             if ($stream === 'school') {
-                $q->where(function($qq) use ($sCls){ $qq->where('stream','school')->orWhere('stream','both'); });
+                $q->where(function($qq){ $qq->where('stream','school')->orWhere('stream','both'); });
                 $q->where(function($qq) use ($sCls){ $qq->whereNull('class_level')->orWhere('class_level', $sCls); });
             } elseif ($stream === 'madarsa') {
                 $q->where(function($qq){ $qq->where('stream','madarsa')->orWhere('stream','both'); });
                 $q->where(function($qq) use ($sSec){ $qq->whereNull('madarsa_section')->orWhere('madarsa_section', $sSec); });
-            } else { // both
-                $q->where('stream','both');
+            } else {
+                $q->where(function($qq){ $qq->where('stream','both')->orWhere('stream','school')->orWhere('stream','madarsa'); });
             }
         })->orderBy('test_date')->get();
 
@@ -96,6 +102,22 @@ class PortalController extends Controller
 
         $examFees = ExamFee::with('event')->where('student_id', $student->id)->orderByDesc('id')->get();
 
+        $books = Book::query()
+            ->when($stream === 'school', function($q) use ($sCls){
+                $q->where(function($qq){ $qq->where('stream','school')->orWhere('stream','both'); });
+                $q->where(function($qq) use ($sCls){ $qq->whereNull('class_level')->orWhere('class_level', $sCls); });
+            })
+            ->when($stream === 'madarsa', function($q) use ($sSec){
+                $q->where(function($qq){ $qq->where('stream','madarsa')->orWhere('stream','both'); });
+                $q->where(function($qq) use ($sSec){ $qq->whereNull('madarsa_section')->orWhere('madarsa_section', $sSec); });
+            })
+            ->when($stream === 'both', function($q){
+                $q->where(function($qq){ $qq->where('stream','both')->orWhere('stream','school')->orWhere('stream','madarsa'); });
+            })
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
+
         $classInfo = SchoolClass::where('class_no', $student->class_no)
             ->where('section', $student->section)
             ->first()
@@ -123,6 +145,7 @@ class PortalController extends Controller
             'alerts'   => $alerts,
             'messages' => $messages,
             'examFees' => $examFees,
+            'books'    => $books,
             'classInfo'=> $classInfo,
             'syncStamp'=> $this->syncStamp($student),
         ]);
@@ -157,14 +180,20 @@ class PortalController extends Controller
 
     private function syncStamp(Student $student): string
     {
+        $stream = $student->stream ?? 'school';
+        $sCls = $student->class_level ?? $student->class_no;
+        $sSec = strtoupper($student->madarsa_section ?? $student->section ?? 'A');
+
         $parts = [
-            Test::where('class_no', $student->class_no)->where('section', $student->section)->count(),
+            Test::count(),
             Mark::where('student_id', $student->id)->count(),
-            Alert::where('class_no', $student->class_no)->max('id'),
+            Alert::max('id'),
             Fee::where('student_id', $student->id)->max('paid_amount'),
             Payment::where('student_id', $student->id)->max('id'),
             Attendance::where('student_id', $student->id)->max('id'),
             Message::max('id'),
+            Book::count(),
+            \App\Models\ExamFee::where('student_id', $student->id)->max('id'),
         ];
 
         return md5(implode('|', $parts));
