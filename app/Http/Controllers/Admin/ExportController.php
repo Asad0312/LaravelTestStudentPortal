@@ -31,20 +31,24 @@ class ExportController extends Controller
                     ]);
                 }
             } elseif ($type === 'fees') {
-                fputcsv($out, ['Student ID', 'Name', 'Class', 'Monthly', 'Paid', 'Remaining', 'Status', 'Month']);
+                fputcsv($out, ['Student ID', 'Name', 'Class', 'Monthly (Base)', 'Carried', 'Total Payable', 'Paid', 'Remaining', 'Status', 'Month']);
                 foreach (Student::with('fees')->get() as $s) {
-                    $fee     = $s->fees->sortByDesc('month')->first();
-                    $monthly = (int) ($fee->monthly_amount ?? 0);
-                    $paid    = (int) ($fee->paid_amount ?? 0);
-                    $rem     = max(0, $monthly - $paid);
+                    $fee       = $s->fees->sortByDesc('month')->first();
+                    $monthly   = (int) ($fee->monthly_amount ?? 0);
+                    $carried   = (int) ($fee->carried_amount ?? 0);
+                    $carriedOut= (int) ($fee->carried_out ?? 0);
+                    $paid      = (int) ($fee->paid_amount ?? 0);
+                    $rem       = max(0, $monthly - $paid - $carriedOut);
                     fputcsv($out, [
                         $s->student_id,
                         $s->name,
                         'Class ' . $s->class_no . '-' . $s->section,
+                        max(0, $monthly - $carried),
+                        $carried,
                         $monthly,
                         $paid,
                         $rem,
-                        $rem <= 0 ? 'Paid' : ($paid > 0 ? 'Pending' : 'Unpaid'),
+                        $rem <= 0 ? ($carriedOut > 0 ? 'Carried' : 'Paid') : ($paid > 0 ? 'Pending' : 'Unpaid'),
                         $fee->month ?? '',
                     ]);
                 }

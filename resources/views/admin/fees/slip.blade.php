@@ -67,10 +67,14 @@
             <div class="card">
                 <h4><i class="fa-solid fa-file-invoice"></i> Fee Details</h4>
                 <div class="row"><span>Slip For</span><b>{{ \Carbon\Carbon::parse($month.'-01')->format('F Y') }}</b></div>
-                <div class="row"><span>Monthly Fee</span><b>Rs. {{ number_format($monthly) }}</b></div>
+                <div class="row"><span>Monthly Fee (Base)</span><b>Rs. {{ number_format($base) }}</b></div>
+                @if($carried > 0)
+                <div class="row"><span>Carried Forward{{ $carriedFrom ? ' (' . $carriedFrom . ')' : '' }}</span><b>Rs. {{ number_format($carried) }}</b></div>
+                @endif
+                <div class="row"><span>Total Payable</span><b>Rs. {{ number_format($monthly) }}</b></div>
                 <div class="row"><span>Total Paid</span><b>Rs. {{ number_format($paid) }}</b></div>
                 <div class="row"><span>Remaining</span><b>Rs. {{ number_format($remaining) }}</b></div>
-                <div class="row"><span>Status</span><b>{{ $remaining <= 0 ? 'PAID' : ($paid > 0 ? 'PENDING' : 'UNPAID') }}</b></div>
+                <div class="row"><span>Status</span><b>{{ $remaining <= 0 ? ($carriedOut > 0 ? 'CARRIED TO NEXT MONTH' : 'PAID') : ($paid > 0 ? 'PENDING' : 'UNPAID') }}</b></div>
             </div>
             <div class="table">
                 <table>
@@ -86,9 +90,16 @@
             </div>
             <div class="summary">
                 <div class="sum">
-                    <div class="sum-row"><span>Monthly Fee</span><span>Rs. {{ number_format($monthly) }}</span></div>
+                    <div class="sum-row"><span>Monthly Fee (Base)</span><span>Rs. {{ number_format($base) }}</span></div>
+                    @if($carried > 0)
+                        <div class="sum-row"><span>Carried Forward</span><span>Rs. {{ number_format($carried) }}</span></div>
+                    @endif
+                    <div class="sum-row"><span>Total Payable</span><span>Rs. {{ number_format($monthly) }}</span></div>
                     <div class="sum-row"><span>Total Paid</span><span>Rs. {{ number_format($paid) }}</span></div>
                     <div class="sum-row total"><span>Balance</span><span>Rs. {{ number_format($remaining) }}</span></div>
+                    @if($carriedOut > 0)
+                        <div class="sum-row" style="color:#b45309"><span>Carried to {{ $carriedTo }}</span><span>Rs. {{ number_format($carriedOut) }}</span></div>
+                    @endif
                 </div>
             </div>
         </div>

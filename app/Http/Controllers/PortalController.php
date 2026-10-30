@@ -14,12 +14,19 @@ use App\Models\Payment;
 use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\Test;
+use App\Services\FeeCarryForward;
+use Carbon\Carbon;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
 class PortalController extends Controller
 {
+    public function __construct(private FeeCarryForward $feeCarry)
+    {
+    }
+
     public function show(Request $request)
     {
         $student = Student::find($request->session()->get('student_id'));
@@ -38,21 +45,34 @@ class PortalController extends Controller
         $week = array_pad($week, 7, 0);
 
         /* fee */
-        $feeRow = $student->fees()->orderByDesc('month')->first();
-        if ($feeRow && $student->monthly_fee && (int)$feeRow->monthly_amount !== (int)$student->monthly_fee) {
-            $feeRow->monthly_amount = (int)$student->monthly_fee;
-            $feeRow->save();
-        } elseif (!$feeRow && $student->monthly_fee) {
-            $feeRow = Fee::firstOrCreate(
-                ['student_id' => $student->id, 'month' => date('Y-m')],
-                ['monthly_amount' => (int)$student->monthly_fee, 'paid_amount' => 0]
-            );
+        $currentMonth = now()->format('Y-m');
+        $feeRow = $student->fees()->where('month', $currentMonth)->first();
+
+        if (! $feeRow) {
+            try {
+                $feeRow = $this->feeCarry->generateForStudent($student, $currentMonth);
+            } catch (UniqueConstraintViolationException) {
+                $feeRow = null;
+            }
+            $feeRow ??= $student->fees()->where('month', $currentMonth)->first();
         }
-        $monthly = (int) ($feeRow->monthly_amount ?? $student->monthly_fee ?? Student::defaultFeeForClass((int) ($student->class_level ?? $student->class_no)));
-        $paid    = (int) ($feeRow->paid_amount ?? 0);
-        $rem     = max(0, $monthly - $paid);
-        $feeStatus = $rem <= 0 ? 'Paid' : ($paid > 0 ? 'Pending' : 'Unpaid');
-        $feePct    = $monthly > 0 ? round(($paid / $monthly) * 100) : 0;
+
+        if (! $feeRow) {
+            $feeRow = $student->fees()->orderByDesc('month')->first();
+        }
+
+        if ($feeRow) {
+            $feeRow = $this->feeCarry->syncBase($feeRow, $student);
+        }
+
+        $monthly    = (int) ($feeRow->monthly_amount ?? $this->feeCarry->baseFee($student));
+        $paid       = (int) ($feeRow->paid_amount ?? 0);
+        $carried    = (int) ($feeRow->carried_amount ?? 0);
+        $carriedOut = (int) ($feeRow->carried_out ?? 0);
+        $base       = max(0, $monthly - $carried);
+        $rem        = max(0, $monthly - $paid - $carriedOut);
+        $feeStatus  = $rem <= 0 ? 'Paid' : ($paid > 0 ? 'Pending' : 'Unpaid');
+        $feePct     = $monthly > 0 ? round(($paid / $monthly) * 100) : 0;
 
         /* academics */
         $stream = $student->stream ?? 'school';
@@ -132,12 +152,23 @@ class PortalController extends Controller
                 'week'    => $week,
             ],
             'fee' => [
-                'monthly'   => $monthly,
-                'paid'      => $paid,
-                'remaining' => $rem,
-                'status'    => $feeStatus,
-                'month'     => $feeRow ? date('F Y', strtotime($feeRow->month . '-01')) : date('F Y'),
-                'pct'       => $feePct,
+                'monthly'      => $monthly,
+                'base'         => $base,
+                'carried'      => $carried,
+                'carried_from' => $feeRow && $feeRow->carried_from
+                    ? Carbon::parse($feeRow->carried_from . '-01')->format('F Y')
+                    : null,
+                'carried_out'  => $carriedOut,
+                'carried_to'   => $carriedOut > 0 && $feeRow
+                    ? Carbon::parse($feeRow->month . '-01')->addMonth()->format('F Y')
+                    : null,
+                'paid'         => $paid,
+                'remaining'    => $rem,
+                'status'       => $feeStatus,
+                'month'        => $feeRow
+                    ? Carbon::parse($feeRow->month . '-01')->format('F Y')
+                    : now()->format('F Y'),
+                'pct'          => $feePct,
             ],
             'payments' => $payments,
             'tests'    => $tests,

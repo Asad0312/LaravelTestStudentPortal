@@ -196,10 +196,22 @@
   <div class="card card-soft p-4 mt-3 anim-fade-up d2">
     <h5 class="section-title mb-3"><i class="fa-solid fa-money-bill-wave me-2 text-success"></i>Fee Status — {{ $fee['month'] }}</h5>
     <div class="row g-3 text-center">
-      <div class="col-4"><div class="rounded-3 p-3" style="background:#f8fafc;"><div class="muted" style="font-size:11.5px;">Monthly Fee</div><b class="fs-5">Rs. {{ number_format($fee['monthly']) }}</b></div></div>
+      <div class="col-4"><div class="rounded-3 p-3" style="background:#f8fafc;"><div class="muted" style="font-size:11.5px;">Total Payable</div><b class="fs-5">Rs. {{ number_format($fee['monthly']) }}</b>@if($fee['carried'] > 0)<div class="muted" style="font-size:10.5px;">Base {{ number_format($fee['base']) }} + carry {{ number_format($fee['carried']) }}</div>@endif</div></div>
       <div class="col-4"><div class="rounded-3 p-3 bg-soft-success"><div class="muted" style="font-size:11.5px;">Paid</div><b class="fs-5 text-success">Rs. {{ number_format($fee['paid']) }}</b></div></div>
       <div class="col-4"><div class="rounded-3 p-3" style="background:{{ $fee['status'] === 'Paid' ? 'var(--success-light)' : 'var(--warning-light)' }};"><div class="muted" style="font-size:11.5px;">Remaining</div><b class="fs-5" style="color:{{ $fee['status'] === 'Paid' ? '#047857' : '#b45309' }}">Rs. {{ number_format($fee['remaining']) }}</b></div></div>
     </div>
+    @if($fee['carried'] > 0)
+      <div class="alert alert-warning mt-3 mb-0 py-2 px-3" style="font-size:12.5px;">
+        <i class="fa-solid fa-arrow-turn-up"></i>
+        Pichle mahine ka baqi balance <b>Rs. {{ number_format($fee['carried']) }}</b> is mahine ki fee me add kar diya gaya hai{{ $fee['carried_from'] ? ' (' . $fee['carried_from'] . ' se)' : '' }}.
+      </div>
+    @endif
+    @if($fee['carried_out'] > 0)
+      <div class="alert alert-info mt-3 mb-0 py-2 px-3" style="font-size:12.5px;">
+        <i class="fa-solid fa-arrow-turn-down"></i>
+        Is mahine ka <b>Rs. {{ number_format($fee['carried_out']) }}</b> balance {{ $fee['carried_to'] }} ki fee me carry ho gaya hai.
+      </div>
+    @endif
     <div class="mt-3">
       <div class="d-flex justify-content-between mb-1"><span class="muted" style="font-size:12.5px;">Paid collection progress</span><b>{{ $fee['pct'] }}% paid</b></div>
       <div class="progress-soft"><div class="progress-bar" style="width:{{ $fee['pct'] }}%;background:{{ $feeBars }};"></div></div>
