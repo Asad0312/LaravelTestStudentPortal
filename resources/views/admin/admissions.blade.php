@@ -36,7 +36,7 @@
       </div>
       <div class="col-md-6"><label class="muted" style="font-size:12px;">Student Name *</label><input class="form-ctrl" name="name" required placeholder="Pura naam likhein" /></div>
       <div class="col-md-6"><label class="muted" style="font-size:12px;">Father Name *</label><input class="form-ctrl" name="father_name" required placeholder="Wald ka naam" /></div>
-      <div class="col-md-4"><label class="muted" style="font-size:12px;">WhatsApp / Phone *</label><input class="form-ctrl" name="phone" required placeholder="03XXXXXXXXX" /></div>
+      <div class="col-md-4"><label class="muted" style="font-size:12px;">WhatsApp / Phone *</label><input class="form-ctrl" name="phone" required placeholder="03XXXXXXXXX ya +923XXXXXXXXX" /></div>
       <div class="col-md-4"><label class="muted" style="font-size:12px;">Monthly Fee *</label><input class="form-ctrl" type="number" name="monthly_fee" value="2500" required /></div>
       <div class="col-md-4"><label class="muted" style="font-size:12px;">Password (khaali chhoda to auto banega)</label><input class="form-ctrl" name="password" placeholder="Auto generate" /></div>
       <div class="col-md-12"><label class="muted" style="font-size:12px;">Address</label><input class="form-ctrl" name="address" placeholder="Mukammal pata" /></div>

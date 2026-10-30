@@ -45,6 +45,7 @@ class AdmissionController extends Controller
         $cls    = (int) ($data['class_level'] ?? $data['class_no'] ?? 6);
         $msection = strtoupper($data['madarsa_section'] ?? 'A');
         $section = $msection;
+        $phone  = preg_replace('/\s+/', '', (string)($data['phone'] ?? ''));
 
         $plainPass = $request->input('password') ?: Student::defaultPassword($data['name']);
 
@@ -52,7 +53,7 @@ class AdmissionController extends Controller
             'app_id'      => Admission::nextAppId(),
             'name'        => $data['name'],
             'father_name' => $data['father_name'],
-            'phone'       => $data['phone'],
+            'phone'       => $phone,
             'email'       => (string) ($data['email'] ?? ''),
             'address'     => (string) ($data['address'] ?? ''),
             'class_no'    => $cls,
@@ -113,12 +114,13 @@ class AdmissionController extends Controller
         DB::transaction(function () use ($admission, $stream, $cls, $msection, $monthlyFee) {
             $admission->update(['status' => 'Approved']);
 
+            $phoneAdm = preg_replace('/\s+/', '', (string)$admission->phone);
             $student = Student::create([
                 'student_id'       => $admission->student_id,
                 'name'             => $admission->name,
                 'father_name'      => $admission->father_name,
-                'phone'            => $admission->phone,
-                'whatsapp'         => $admission->phone,
+                'phone'            => $phoneAdm,
+                'whatsapp'         => $phoneAdm,
                 'email'            => $admission->email,
                 'address'          => $admission->address,
                 'stream'           => $stream,

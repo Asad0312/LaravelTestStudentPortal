@@ -68,6 +68,7 @@ class StudentController extends Controller
         $cls    = (int) ($data['class_level'] ?? $data['class_no'] ?? 6);
         $msection = strtoupper($data['madarsa_section'] ?? 'A');
         $section = $msection;
+        $phone = preg_replace('/\s+/', '', (string)($data['phone'] ?? ''));
 
         DB::beginTransaction();
         try {
@@ -75,8 +76,8 @@ class StudentController extends Controller
                 'student_id'       => Student::nextStudentId(),
                 'name'             => $data['name'],
                 'father_name'      => (string) ($data['father_name'] ?? ''),
-                'phone'            => (string) ($data['phone'] ?? ''),
-                'whatsapp'         => (string) ($data['phone'] ?? ''),
+                'phone'            => $phone,
+                'whatsapp'         => $phone,
                 'email'            => (string) ($data['email'] ?? ''),
                 'address'          => (string) ($data['address'] ?? ''),
                 'stream'           => $stream,
@@ -147,12 +148,13 @@ class StudentController extends Controller
         $stream = $data['stream'] ?? $student->stream ?? 'school';
         $cls    = (int) ($data['class_level'] ?? $data['class_no'] ?? $student->class_level ?? $student->class_no ?? 6);
         $msec   = strtoupper($data['madarsa_section'] ?? $data['section'] ?? $student->madarsa_section ?? $student->section ?? 'A');
+        $phone  = preg_replace('/\s+/', '', (string)($data['phone'] ?? $student->phone ?? ''));
 
         $update = [
             'name'           => $data['name'],
             'father_name'    => (string) ($data['father_name'] ?? ''),
-            'phone'          => (string) ($data['phone'] ?? ''),
-            'whatsapp'       => (string) ($data['phone'] ?? $student->whatsapp ?? ''),
+            'phone'          => $phone,
+            'whatsapp'       => $phone ?: $student->whatsapp,
             'email'          => (string) ($data['email'] ?? ''),
             'address'        => (string) ($data['address'] ?? ''),
             'stream'         => $stream,

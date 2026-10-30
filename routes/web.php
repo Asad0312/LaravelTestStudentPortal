@@ -65,6 +65,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     Route::get('fees', [FeeController::class, 'index'])->name('fees.index');
     Route::post('fees/payment', [FeeController::class, 'addPayment'])->name('fees.payment');
     Route::get('fees/slip/{student}/{month}', [FeeController::class, 'slip'])->name('fees.slip');
+    Route::get('fees/history/{student}', [FeeController::class, 'history'])->name('fees.history');
 
     Route::get('exams', [ExamController::class, 'index'])->name('exams.index');
     Route::post('exams', [ExamController::class, 'store'])->name('exams.store');

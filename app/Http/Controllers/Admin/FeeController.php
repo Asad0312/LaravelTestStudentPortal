@@ -14,10 +14,14 @@ class FeeController extends Controller
 {
     public function index()
     {
+        $currentMonth = date('Y-m');
         $students = Student::orderByRaw(Sql::numericSuffix('student_id'))
             ->get()
-            ->map(function (Student $s) {
-                $fee = $s->fees()->orderByDesc('month')->first();
+            ->map(function (Student $s) use ($currentMonth) {
+                $fee = $s->fees()->where('month', $currentMonth)->first();
+                if (!$fee) {
+                    $fee = $s->fees()->orderByDesc('month')->first();
+                }
                 if ($fee && $s->monthly_fee && (int)$fee->monthly_amount !== (int)$s->monthly_fee) {
                     $fee->monthly_amount = (int)$s->monthly_fee;
                     $fee->save();
@@ -33,11 +37,13 @@ class FeeController extends Controller
                     'name'      => $s->name,
                     'cls'       => method_exists($s, 'getDisplayClassAttribute') ? $s->display_class : ('Class ' . ($s->class_level ?? $s->class_no) . '-' . ($s->madarsa_section ?? $s->section)),
                     'avatar'    => $s->avatar_seed,
+                    'phone'     => $s->whatsapp ?: $s->phone ?: '—',
                     'monthly'   => $monthly,
                     'paid'      => $paid,
                     'remaining' => $rem,
                     'status'    => $rem <= 0 ? 'Paid' : ($paid > 0 ? 'Pending' : 'Unpaid'),
-                    'month'     => $fee ? date('F Y', strtotime($fee->month . '-01')) : date('F Y'),
+                    'month'     => $fee ? date('F Y', strtotime($fee->month . '-01')) : date('F Y', strtotime($currentMonth.'-01')),
+                    'monthRaw'  => $fee ? $fee->month : $currentMonth,
                 ];
             });
 
@@ -115,5 +121,29 @@ class FeeController extends Controller
             'remaining'=> $rem,
             'payments' => $payments,
         ]);
+    }
+
+    public function history(int $studentId)
+    {
+        $student = Student::findOrFail($studentId);
+        $fees = Fee::where('student_id', $student->id)->orderBy('month')->get();
+        $payments = Payment::where('student_id', $student->id)->orderBy('month')->orderBy('id')->get()->groupBy('month');
+
+        $rows = $fees->map(function($fee) use ($payments){
+            $pays = $payments->get($fee->month, collect());
+            $paid = $pays->sum('amount');
+            $rem = max(0, (int)$fee->monthly_amount - $paid);
+            return [
+                'month' => date('F Y', strtotime($fee->month.'-01')),
+                'raw'   => $fee->month,
+                'monthly' => (int)$fee->monthly_amount,
+                'paid'  => $paid,
+                'remaining' => $rem,
+                'status'=> $rem <= 0 ? 'Paid' : ($paid > 0 ? 'Pending' : 'Unpaid'),
+                'payments' => $pays,
+            ];
+        });
+
+        return view('admin.fees.history', compact('student', 'rows'));
     }
 }

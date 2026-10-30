@@ -24,23 +24,25 @@
 <div class="card card-soft p-3">
   <div class="table-responsive">
     <table class="table table-hover align-middle">
-      <thead><tr><th>Student</th><th>Class</th><th>Monthly</th><th>Paid</th><th>Remaining</th><th>Status</th><th class="text-end">Action</th></tr></thead>
+      <thead><tr><th>Student</th><th>Class</th><th>Contact</th><th>Monthly</th><th>Paid</th><th>Remaining</th><th>Status</th><th class="text-end">Action</th></tr></thead>
       <tbody>
         @forelse($rows as $r)
           <tr>
             <td><b style="font-size:13.5px;">{{ $r['name'] }}</b><div class="muted" style="font-size:11.5px;">{{ $r['studentId'] }} • {{ $r['month'] }}</div></td>
             <td>{{ $r['cls'] }}</td>
+            <td>{{ $r['phone'] ?? '—' }}</td>
             <td>Rs. {{ number_format($r['monthly']) }}</td>
             <td class="text-success">Rs. {{ number_format($r['paid']) }}</td>
             <td class="{{ $r['remaining'] > 0 ? 'text-danger' : '' }}">Rs. {{ number_format($r['remaining']) }}</td>
             <td><span class="badge {{ $r['status'] === 'Paid' ? 'bg-soft-success' : ($r['status'] === 'Pending' ? 'bg-soft-warning' : 'bg-soft-danger') }}">{{ $r['status'] }}</span></td>
             <td class="text-end">
-              <a class="btn btn-sm btn-outline-primary" target="_blank" href="{{ route('admin.fees.slip', [$r['dbId'], date('Y-m')]) }}"><i class="fa-solid fa-print"></i> Print Slip</a>
+              <a class="btn btn-sm btn-outline-info" href="{{ route('admin.fees.history', $r['dbId']) }}"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+              <a class="btn btn-sm btn-outline-primary" target="_blank" href="{{ route('admin.fees.slip', [$r['dbId'], $r['monthRaw'] ?? date('Y-m')]) }}"><i class="fa-solid fa-print"></i> Slip</a>
               <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#payModal{{ $r['dbId'] }}"><i class="fa-solid fa-plus"></i> Payment</button>
             </td>
           </tr>
         @empty
-          <tr><td colspan="7" class="text-center muted py-4">Koi student nahi — pehle students add karein.</td></tr>
+          <tr><td colspan="8" class="text-center muted py-4">Koi student nahi — pehle students add karein.</td></tr>
         @endforelse
       </tbody>
     </table>

@@ -90,7 +90,7 @@
             <label class="muted" style="font-size:12px;">Madarsa Section *</label>
             <select class="form-ctrl" name="madarsa_section">@foreach(['A','B','C','D'] as $sec)<option>{{ $sec }}</option>@endforeach</select>
           </div>
-          <div class="col-md-4"><label class="muted" style="font-size:12px;">WhatsApp / Phone</label><input class="form-ctrl" name="phone" placeholder="03XXXXXXXXX" /></div>
+          <div class="col-md-4"><label class="muted" style="font-size:12px;">WhatsApp / Phone</label><input class="form-ctrl" name="phone" placeholder="03XXXXXXXXX ya +923XXXXXXXXX" /></div>
           <div class="col-md-4"><label class="muted" style="font-size:12px;">Monthly Fee *</label><input class="form-ctrl" type="number" name="monthly_fee" value="2500" required /></div>
           <div class="col-md-6"><label class="muted" style="font-size:12px;">Email (alerts ke liye)</label><input class="form-ctrl" type="email" name="email" /></div>
           <div class="col-md-6"><label class="muted" style="font-size:12px;">Address</label><input class="form-ctrl" name="address" /></div>
