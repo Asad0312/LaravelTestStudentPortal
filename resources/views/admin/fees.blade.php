@@ -22,7 +22,7 @@
 <div class="card card-soft p-3 mb-3">
   <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
     <form method="get" action="{{ route('admin.fees.index') }}" class="d-flex flex-wrap gap-2" style="flex:1;min-width:280px;">
-      <input class="form-ctrl" type="text" name="q" value="{{ $q }}" placeholder="Student ID / name / phone — e.g. STU-1" style="flex:1;min-width:220px;" />
+      <input class="form-ctrl" type="text" name="q" value="{{ $q }}" placeholder="Search by Student ID / Name / Phone / WhatsApp" style="flex:1;min-width:260px;" />
       <button class="btn-primary-grad" style="padding:9px 16px;font-size:13px;" type="submit"><i class="fa-solid fa-magnifying-glass me-1"></i> Filter</button>
       @if($q !== '')
         <a class="btn btn-light" style="padding:9px 14px;font-size:13px;" href="{{ route('admin.fees.index') }}">Clear</a>

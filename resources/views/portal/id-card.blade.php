@@ -7,10 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, Arial, sans-serif; }
   body {
-    background: #cbd5e1;
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #d1d5db;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -21,141 +20,141 @@
     width: 85.6mm;
     height: 53.98mm;
     background: #ffffff;
-    border-radius: 6px;
+    border-radius: 5px;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 30px 40px -28px rgba(15, 23, 42, 0.9);
-    border: 1px solid rgba(15, 23, 42, 0.12);
+    box-shadow: 0 30px 40px -28px rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(15, 23, 42, 0.14);
   }
   .header {
-    height: 14.5mm;
-    background: linear-gradient(90deg, #0f766e 0%, #22d3ee 100%);
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 0 9px;
-    color: #fff;
+    height: 14mm;
+    background: linear-gradient(90deg, #0f766e 0%, #14b8a6 100%);
+    display: table;
+    width: 100%;
+  }
+  .header-inner {
+    display: table-row;
+  }
+  .logo-cell {
+    display: table-cell;
+    width: 10mm;
+    vertical-align: middle;
+    padding-left: 8px;
   }
   .logo {
-    width: 9mm;
-    height: 9mm;
+    width: 8.5mm;
+    height: 8.5mm;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.26);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
+    color: #fff;
+    font-size: 13px;
   }
-  .school-text { min-width: 0; }
-  .school-text .name {
+  .school-cell {
+    display: table-cell;
+    vertical-align: middle;
+    padding-left: 6px;
+  }
+  .school-name {
     font-weight: 800;
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    line-height: 1;
-  }
-  .school-text .tagline {
-    font-size: 6px;
+    font-size: 9.8px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    opacity: 0.92;
-    margin-top: 2px;
-    white-space: nowrap;
+    color: #fff;
+    line-height: 1;
   }
-  .content {
-    display: flex;
-    align-items: flex-start;
-    gap: 6px;
-    padding: 5px 9px 0;
-    height: calc(53.98mm - 14.5mm - 4.2mm);
+  .school-sub {
+    font-size: 5.6px;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.92);
+    margin-top: 2px;
+  }
+  .main {
+    position: relative;
+    height: calc(53.98mm - 14mm - 4mm);
+    padding: 4px 7px 0 7px;
   }
   .photo {
-    width: 19mm;
-    height: 24mm;
-    border-radius: 4px;
+    position: absolute;
+    left: 7px;
+    top: 4px;
+    width: 18.5mm;
+    height: 23.5mm;
+    border-radius: 3px;
     overflow: hidden;
-    border: 1px solid rgba(15, 118, 110, 0.6);
-    flex-shrink: 0;
-    background: #f1f5f9;
+    border: 1px solid rgba(15, 118, 110, 0.65);
+    background: #f8fafc;
   }
   .photo img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
   }
-  .info {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+  .details {
+    margin-left: 21.5mm;
+    margin-right: 15mm;
   }
   .student-name {
     font-weight: 800;
-    font-size: 9.2px;
+    font-size: 9px;
     text-transform: uppercase;
     color: #0f172a;
-    line-height: 1.2;
+    line-height: 1.25;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .id-pill {
-    align-self: flex-start;
-    background: rgba(20, 184, 166, 0.16);
+    display: inline-block;
+    margin-top: 1px;
+    background: rgba(20, 184, 166, 0.18);
     color: #0f766e;
     font-weight: 700;
-    font-size: 6.2px;
-    padding: 1px 6px;
+    font-size: 5.8px;
+    padding: 0 5px;
     border-radius: 999px;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    white-space: nowrap;
   }
-  .rows {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin-top: 1px;
+  .info-table {
+    margin-top: 2px;
+    width: 100%;
   }
-  .row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 4px;
-    font-size: 6.8px;
-    line-height: 1.15;
+  .info-table td {
+    font-size: 6.6px;
+    padding: 1px 0;
+    vertical-align: top;
   }
-  .row .label {
+  .info-table .label {
     color: #475569;
-    white-space: nowrap;
+    width: 16mm;
   }
-  .row .value {
+  .info-table .value {
     color: #0f172a;
     font-weight: 600;
     text-align: right;
-    max-width: 30mm;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: 24mm;
   }
   .qr {
-    flex-shrink: 0;
-    align-self: flex-end;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1px;
+    position: absolute;
+    right: 6px;
+    top: 10px;
+    text-align: center;
   }
   .qr-box {
-    width: 13mm;
-    height: 13mm;
-    border: 1px solid rgba(148, 163, 184, 0.9);
-    border-radius: 3px;
+    width: 12.5mm;
+    height: 12.5mm;
+    border: 1px solid rgba(148, 163, 184, 0.95);
+    border-radius: 2px;
     padding: 1px;
     background: #fff;
+    margin: 0 auto;
   }
   .qr-box img {
     width: 100%;
@@ -163,25 +162,25 @@
     display: block;
   }
   .qr-text {
-    font-size: 4.8px;
+    font-size: 4.6px;
     text-transform: uppercase;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.24em;
     color: #475569;
-    white-space: nowrap;
+    margin-top: 1px;
   }
   .footer {
     position: absolute;
     left: 0;
     bottom: 0;
     width: 100%;
-    height: 4.2mm;
-    background: linear-gradient(90deg, #0f766e 0%, #22d3ee 100%);
+    height: 4mm;
+    background: linear-gradient(90deg, #0f766e 0%, #14b8a6 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #fff;
-    font-size: 5px;
-    letter-spacing: 0.36em;
+    font-size: 4.8px;
+    letter-spacing: 0.42em;
     text-transform: uppercase;
   }
   .actions {
@@ -235,52 +234,52 @@
 
 <div class="id-card">
   <div class="header">
-    <div class="logo">
-      <i class="fa-solid fa-graduation-cap"></i>
-    </div>
-    <div class="school-text">
-      <div class="name">IRAA</div>
-      <div class="tagline">Iqra Riffat ull Atfal Academy</div>
+    <div class="header-inner">
+      <div class="logo-cell">
+        <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+      </div>
+      <div class="school-cell">
+        <div class="school-name">IRAA</div>
+        <div class="school-sub">Iqra Riffat ull Atfal Academy</div>
+      </div>
     </div>
   </div>
 
-  <div class="content">
+  <div class="main">
     <div class="photo">
       <img src="{{ $avatar }}" alt="{{ $student->name }}">
     </div>
-
-    <div class="info">
-      <div class="student-name">{{ Str::limit($student->name, 28) }}</div>
-      <div class="id-pill">ID: {{ $student->student_id }}</div>
-      <div class="rows">
-        <div class="row">
-          <span class="label">Father</span>
-          <span class="value">{{ Str::limit($student->father_name ?: '—', 20) }}</span>
-        </div>
-        <div class="row">
-          <span class="label">Class</span>
-          <span class="value">{{ $cls }}</span>
-        </div>
-        <div class="row">
-          <span class="label">Phone</span>
-          <span class="value">{{ $student->whatsapp ?: $student->phone ?: '—' }}</span>
-        </div>
-        <div class="row">
-          <span class="label">Session</span>
-          <span class="value">{{ $student->batch ?: 'Session '.date('Y') }}</span>
-        </div>
-      </div>
+    <div class="details">
+      <div class="student-name">{{ $student->name }}</div>
+      <div class="id-pill">STUDENT ID • {{ $student->student_id }}</div>
+      <table class="info-table" cellspacing="0" cellpadding="0">
+        <tr>
+          <td class="label">Father Name</td>
+          <td class="value">{{ $student->father_name ?: '—' }}</td>
+        </tr>
+        <tr>
+          <td class="label">Class</td>
+          <td class="value">{{ $cls }}</td>
+        </tr>
+        <tr>
+          <td class="label">Contact</td>
+          <td class="value">{{ $student->whatsapp ?: $student->phone ?: '—' }}</td>
+        </tr>
+        <tr>
+          <td class="label">Session</td>
+          <td class="value">{{ $student->batch ?: 'Session '.date('Y') }}</td>
+        </tr>
+      </table>
     </div>
-
     <div class="qr">
       <div class="qr-box">
-        <img src="{{ $qr }}" alt="QR Code">
+        <img src="{{ $qr }}" alt="QR">
       </div>
-      <div class="qr-text">Scan</div>
+      <div class="qr-text">SCAN</div>
     </div>
   </div>
 
-  <div class="footer">Student Identity Card</div>
+  <div class="footer">STUDENT IDENTITY CARD</div>
 </div>
 
 <div class="actions">
