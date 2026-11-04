@@ -35,13 +35,19 @@ class FeeController extends Controller
         $students = Student::orderByRaw(Sql::numericSuffix('student_id'))
             ->when($q !== '', function ($query) use ($q) {
                 $like = '%' . mb_strtolower($q) . '%';
+                $num = preg_replace('/\D+/', '', $q);
 
-                $query->where(function ($w) use ($like) {
+                $query->where(function ($w) use ($like, $num, $q) {
                     $w->whereRaw('LOWER(student_id) LIKE ?', [$like])
                         ->orWhereRaw('LOWER(name) LIKE ?', [$like])
                         ->orWhereRaw("LOWER(COALESCE(father_name, '')) LIKE ?", [$like])
                         ->orWhereRaw("LOWER(COALESCE(phone, '')) LIKE ?", [$like])
                         ->orWhereRaw("LOWER(COALESCE(whatsapp, '')) LIKE ?", [$like]);
+
+                    if ($num !== '') {
+                        $w->orWhereRaw("REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(phone,''), '+',''), '-', ''), ' ', ''), '(', '') LIKE ?", ['%' . $num . '%'])
+                          ->orWhereRaw("REPLACE(REPLACE(REPLACE(REPLACE(COALESCE(whatsapp,''), '+',''), '-', ''), ' ', ''), '(', '') LIKE ?", ['%' . $num . '%']);
+                    }
                 });
             })
             ->get()
