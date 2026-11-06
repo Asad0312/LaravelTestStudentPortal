@@ -16,6 +16,7 @@
     <div class="col-md-3" id="cwrap">
       <label class="muted" style="font-size:12px;">Class</label>
       <select class="form-ctrl" name="class_level">
+        <option value="0" {{ ($classLevel !== null && $classLevel !== '' && (int)$classLevel===0)?'selected':'' }}>Montessori</option>
         @for($i=1;$i<=8;$i++)<option value="{{ $i }}" {{ ($classLevel==$i)?'selected':'' }}>Class {{ $i }}</option>@endfor
       </select>
     </div>
@@ -39,7 +40,7 @@
   <input type="hidden" name="madarsa_section" value="{{ $section }}">
   <div class="card card-soft p-3">
     <div class="d-flex justify-content-between mb-2">
-      <h6 class="fw-bold mb-0">{{ $stream === 'school' ? 'School Books — Class '.$classLevel : 'Madarsa Books — Section '.$section }}</h6>
+      <h6 class="fw-bold mb-0">{{ $stream === 'school' ? 'School Books — '.\App\Models\Student::classLabel($classLevel) : 'Madarsa Books — Section '.$section }}</h6>
       <button class="btn-primary-grad" style="padding:8px 14px;">Save All</button>
     </div>
     <div class="table-responsive">

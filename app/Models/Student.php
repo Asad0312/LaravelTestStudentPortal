@@ -54,6 +54,18 @@ class Student extends Model
         return strtolower(preg_replace('/\s+/', '', $name)) . '123';
     }
 
+    /** Label for a numeric class level (0 = Montessori). */
+    public static function classLabel(int|string|null $classNo): string
+    {
+        if ($classNo === null || $classNo === '') {
+            return '—';
+        }
+
+        $n = (int) $classNo;
+
+        return $n === 0 ? 'Montessori' : 'Class ' . $n;
+    }
+
     public function getDisplayClassAttribute(): string
     {
         if (($this->stream ?? 'school') === 'madarsa') {
@@ -62,10 +74,10 @@ class Student extends Model
         if (($this->stream ?? 'school') === 'both') {
             $cls = $this->class_level ?? $this->class_no;
             $sec = $this->madarsa_section ?? $this->section;
-            return 'Class ' . $cls . ' + Madarsa ' . $sec;
+            return self::classLabel($cls) . ' + Madarsa ' . $sec;
         }
-        $cls = $this->class_level ?? $this->class_no;
-        return 'Class ' . $cls;
+
+        return self::classLabel($this->class_level ?? $this->class_no);
     }
 
     public function getWhatsappNumberAttribute(): string

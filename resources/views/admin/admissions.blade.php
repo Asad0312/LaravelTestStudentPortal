@@ -27,6 +27,7 @@
         <label class="muted" style="font-size:12px;">Class *</label>
         <select class="form-ctrl" name="class_no">
           <option value="" disabled selected>Select Class</option>
+          <option value="0">Montessori</option>
           @for($i = 1; $i <= 8; $i++)<option value="{{ $i }}">Class {{ $i }}</option>@endfor
         </select>
       </div>
@@ -64,7 +65,7 @@ document.getElementById('admStream')?.addEventListener('change', function(){
           <tr>
             <td><b>{{ $a->app_id }}</b><div class="muted" style="font-size:11.5px;">{{ $a->created_at?->format('d M Y') }}</div></td>
             <td><b style="font-size:13.5px;">{{ $a->name }}</b><div class="muted" style="font-size:11.5px;">S/o {{ $a->father_name }}</div></td>
-            <td>Class {{ $a->class_no }}-{{ $a->section }}</td>
+            <td>{{ \App\Models\Student::classLabel($a->class_no) }}-{{ $a->section }}</td>
             <td>{{ $a->phone }}</td>
             <td><span class="badge {{ $a->status === 'Approved' ? 'bg-soft-success' : ($a->status === 'Rejected' ? 'bg-soft-danger' : 'bg-soft-warning') }}">{{ $a->status }}</span></td>
             <td class="text-end">
@@ -103,7 +104,10 @@ document.getElementById('admStream')?.addEventListener('change', function(){
           <div class="col-md-4"><label class="muted" style="font-size:12px;">Phone *</label><input class="form-ctrl" name="phone" required /></div>
           <div class="col-md-4"><label class="muted" style="font-size:12px;">Email</label><input class="form-ctrl" type="email" name="email" /></div>
           <div class="col-md-4"><label class="muted" style="font-size:12px;">Class *</label>
-            <select class="form-ctrl" name="class_no">@for($i = 1; $i <= 12; $i++)<option value="{{ $i }}" {{ $i === 6 ? 'selected' : '' }}>Class {{ $i }}</option>@endfor</select>
+            <select class="form-ctrl" name="class_no">
+              <option value="0">Montessori</option>
+              @for($i = 1; $i <= 8; $i++)<option value="{{ $i }}" {{ $i === 6 ? 'selected' : '' }}>Class {{ $i }}</option>@endfor
+            </select>
           </div>
           <div class="col-md-4"><label class="muted" style="font-size:12px;">Section</label>
             <select class="form-ctrl" name="section">@foreach(['A','B','C','D'] as $sec)<option>{{ $sec }}</option>@endforeach</select>

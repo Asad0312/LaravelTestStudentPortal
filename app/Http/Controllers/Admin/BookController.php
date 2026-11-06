@@ -16,7 +16,7 @@ class BookController extends Controller
 
         $books = Book::query()
             ->when($stream, fn($q) => $q->where('stream', $stream))
-            ->when($classLevel && $stream === 'school', fn($q) => $q->where('class_level', $classLevel))
+            ->when($classLevel !== null && $classLevel !== '' && $stream === 'school', fn($q) => $q->where('class_level', $classLevel))
             ->when($section && $stream === 'madarsa', fn($q) => $q->where('madarsa_section', $section))
             ->orderBy('sort_order')->orderBy('id')
             ->get();
@@ -34,7 +34,7 @@ class BookController extends Controller
     {
         $data = $request->validate([
             'stream' => ['required', 'in:school,madarsa'],
-            'class_level' => ['nullable', 'integer', 'between:1,8'],
+            'class_level' => ['nullable', 'integer', 'between:0,8'],
             'madarsa_section' => ['nullable', 'string', 'max:1'],
             'items' => ['array'],
         ]);

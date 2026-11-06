@@ -10,7 +10,7 @@
     <select class="form-ctrl" name="test" style="min-width:320px;">
       @forelse($tests as $t)
         <option value="{{ $t->test_code }}" {{ $test && $test->test_code === $t->test_code ? 'selected' : '' }}>
-          {{ $t->test_code }} — {{ $t->subject }} (Class {{ $t->class_no }}-{{ $t->section }}, {{ $t->total_marks }} marks)
+          {{ $t->test_code }} — {{ $t->subject }} ({{ \App\Models\Student::classLabel($t->class_no) }}-{{ $t->section }}, {{ $t->total_marks }} marks)
         </option>
       @empty
         <option value="">Pehle test upload karein</option>
@@ -29,7 +29,7 @@
     <div class="d-flex justify-content-between align-items-center mb-2">
       <h5 class="section-title mb-0">
         {{ $test->type }} — {{ $test->subject }}
-        <span class="muted" style="font-size:12px;font-weight:400;">Class {{ $test->class_no }}-{{ $test->section }} • {{ $test->test_date?->format('d M Y') }}</span>
+        <span class="muted" style="font-size:12px;font-weight:400;">{{ \App\Models\Student::classLabel($test->class_no) }}-{{ $test->section }} • {{ $test->test_date?->format('d M Y') }}</span>
       </h5>
       <span class="badge bg-soft-warning">Out of {{ $test->total_marks }}</span>
     </div>

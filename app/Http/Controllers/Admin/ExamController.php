@@ -23,7 +23,7 @@ class ExamController extends Controller
             'title' => ['required', 'string', 'max:150'],
             'exam_month' => ['required', 'date'],
             'stream' => ['required', 'in:school,madarsa,both'],
-            'class_level' => ['nullable', 'integer', 'between:1,8'],
+            'class_level' => ['nullable', 'integer', 'between:0,8'],
             'madarsa_section' => ['nullable', 'string', 'max:1'],
             'exam_fee' => ['required', 'numeric', 'min:0'],
         ]);

@@ -44,7 +44,7 @@
           <tr>
             <td><b style="font-size:13.5px;">{{ $s->name }}</b></td>
             <td><span class="badge bg-soft-primary">{{ $s->student_id }}</span></td>
-            <td>Class {{ $s->class_no }}-{{ $s->section }}</td>
+            <td>{{ \App\Models\Student::classLabel($s->class_no) }}-{{ $s->section }}</td>
             <td>
               @if($row)
                 <span class="badge {{ $row->status === 'Present' ? 'bg-soft-success' : 'bg-soft-danger' }}">{{ $row->status }}</span>

@@ -25,7 +25,7 @@ class ExportController extends Controller
                         $a->date,
                         $a->student?->student_id,
                         $a->student?->name,
-                        $a->student ? 'Class ' . $a->student->class_no . '-' . $a->student->section : '',
+                        $a->student ? Student::classLabel($a->student->class_no) . '-' . $a->student->section : '',
                         $a->status,
                         $a->check_in_at ?? '',
                     ]);
@@ -42,7 +42,7 @@ class ExportController extends Controller
                     fputcsv($out, [
                         $s->student_id,
                         $s->name,
-                        'Class ' . $s->class_no . '-' . $s->section,
+                        Student::classLabel($s->class_no) . '-' . $s->section,
                         max(0, $monthly - $carried),
                         $carried,
                         $monthly,
@@ -62,7 +62,7 @@ class ExportController extends Controller
                         $s->phone,
                         $s->email,
                         $s->address,
-                        'Class ' . $s->class_no . '-' . $s->section,
+                        Student::classLabel($s->class_no) . '-' . $s->section,
                         $s->status,
                         optional($s->admission_date)->format('Y-m-d'),
                     ]);

@@ -45,7 +45,7 @@
           <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
             <div>
               <b style="font-size:13.5px;">{{ $row->student?->name ?? 'Student' }}</b>
-              <div class="muted" style="font-size:11.5px;">{{ $row->student?->student_id }} — Class {{ $row->student?->class_no }}-{{ $row->student?->section }}</div>
+              <div class="muted" style="font-size:11.5px;">{{ $row->student?->student_id }} — {{ \App\Models\Student::classLabel($row->student?->class_no) }}-{{ $row->student?->section }}</div>
             </div>
             <span class="badge bg-soft-success">{{ $row->check_in_at ? date('h:i A', strtotime($row->check_in_at)) : 'Present' }}</span>
           </div>

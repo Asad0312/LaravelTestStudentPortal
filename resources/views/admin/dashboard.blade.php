@@ -76,7 +76,7 @@
           <div class="flex-shrink-0" style="width:34px;height:34px;border-radius:10px;background:var(--warning-light);color:#b45309;display:grid;place-items:center;"><i class="fa-solid fa-bell"></i></div>
           <div>
             <b style="font-size:13px;">{{ $a->msg }}</b>
-            <div class="muted" style="font-size:11.5px;">Class {{ $a->class_no }}-{{ $a->section }} • {{ $a->created_at?->format('d M Y') }}</div>
+            <div class="muted" style="font-size:11.5px;">{{ \App\Models\Student::classLabel($a->class_no) }}-{{ $a->section }} • {{ $a->created_at?->format('d M Y') }}</div>
           </div>
         </div>
       @empty
@@ -90,7 +90,7 @@
       <h5 class="section-title mb-3"><i class="fa-solid fa-users me-2 text-primary"></i>Students per Class</h5>
       @forelse($byClass as $row)
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <span>Class {{ $row->class_no }}</span>
+          <span>{{ \App\Models\Student::classLabel($row->class_no) }}</span>
           <div class="flex-grow-1 mx-3" style="height:8px;background:#f1f5f9;border-radius:8px;overflow:hidden;">
             <div style="height:100%;width:{{ $totalStudents ? round(($row->total / $totalStudents) * 100) : 0 }}%;background:var(--gradient-primary,#0f766e);border-radius:8px;"></div>
           </div>

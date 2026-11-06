@@ -79,7 +79,7 @@
             </select>
           </div>
           <div class="col-md-4 js-class-part d-none"><label class="muted" style="font-size:12px;">Class</label>
-            <select class="form-ctrl" name="class_no">@for($i = 1; $i <= 12; $i++)<option value="{{ $i }}" {{ $i === 6 ? 'selected' : '' }}>Class {{ $i }}</option>@endfor</select>
+            <select class="form-ctrl" name="class_no"><option value="0">Montessori</option>@for($i = 1; $i <= 8; $i++)<option value="{{ $i }}" {{ $i === 6 ? 'selected' : '' }}>Class {{ $i }}</option>@endfor</select>
           </div>
           <div class="col-md-4 js-class-part d-none"><label class="muted" style="font-size:12px;">Section</label>
             <select class="form-ctrl" name="section"><option value="">All Sections</option>@foreach(['A','B','C','D'] as $sec)<option>{{ $sec }}</option>@endforeach</select>
@@ -119,7 +119,7 @@
             </select>
           </div>
           <div class="col-md-4 js-class-part {{ $m->class_no === null ? 'd-none' : '' }}"><label class="muted" style="font-size:12px;">Class</label>
-            <select class="form-ctrl" name="class_no">@for($i = 1; $i <= 12; $i++)<option value="{{ $i }}" {{ (int) $m->class_no === $i ? 'selected' : '' }}>Class {{ $i }}</option>@endfor</select>
+            <select class="form-ctrl" name="class_no"><option value="0" {{ (int) $m->class_no === 0 ? 'selected' : '' }}>Montessori</option>@for($i = 1; $i <= 8; $i++)<option value="{{ $i }}" {{ (int) $m->class_no === $i ? 'selected' : '' }}>Class {{ $i }}</option>@endfor</select>
           </div>
           <div class="col-md-4 js-class-part {{ $m->class_no === null ? 'd-none' : '' }}"><label class="muted" style="font-size:12px;">Section</label>
             <select class="form-ctrl" name="section"><option value="" {{ $m->section === '' ? 'selected' : '' }}>All Sections</option>@foreach(['A','B','C','D'] as $sec)<option {{ $m->section === $sec ? 'selected' : '' }}>{{ $sec }}</option>@endforeach</select>

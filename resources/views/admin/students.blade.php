@@ -83,6 +83,7 @@
             <label class="muted" style="font-size:12px;">Class *</label>
             <select class="form-ctrl" name="class_no">
               <option value="" disabled selected>Select Class</option>
+              <option value="0">Montessori</option>
               @for($i = 1; $i <= 8; $i++)<option value="{{ $i }}">Class {{ $i }}</option>@endfor
             </select>
           </div>
@@ -128,7 +129,10 @@ document.getElementById('addStream')?.addEventListener('change', function(){
           <div class="col-md-6"><label class="muted" style="font-size:12px;">Full Name *</label><input class="form-ctrl" name="name" value="{{ old('name', $s->name) }}" required /></div>
           <div class="col-md-6"><label class="muted" style="font-size:12px;">Father Name</label><input class="form-ctrl" name="father_name" value="{{ $s->father_name }}" /></div>
           <div class="col-md-3"><label class="muted" style="font-size:12px;">Class *</label>
-            <select class="form-ctrl" name="class_no">@for($i = 1; $i <= 12; $i++)<option value="{{ $i }}" {{ $s->class_no === $i ? 'selected' : '' }}>Class {{ $i }}</option>@endfor</select>
+            <select class="form-ctrl" name="class_no">
+              <option value="0" {{ (int) $s->class_no === 0 ? 'selected' : '' }}>Montessori</option>
+              @for($i = 1; $i <= 8; $i++)<option value="{{ $i }}" {{ (int) $s->class_no === $i ? 'selected' : '' }}>Class {{ $i }}</option>@endfor
+            </select>
           </div>
           <div class="col-md-3"><label class="muted" style="font-size:12px;">Section *</label>
             <select class="form-ctrl" name="section">@foreach(['A','B','C','D'] as $sec)<option {{ $s->section === $sec ? 'selected' : '' }}>{{ $sec }}</option>@endforeach</select>

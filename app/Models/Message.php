@@ -52,6 +52,6 @@ class Message extends Model
             return 'All Students';
         }
 
-        return 'Class ' . $this->class_no . ($this->section ? '-' . $this->section : ' (All sections)');
+        return \App\Models\Student::classLabel($this->class_no) . ($this->section ? '-' . $this->section : ' (All sections)');
     }
 }

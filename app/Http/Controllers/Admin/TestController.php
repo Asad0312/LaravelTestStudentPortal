@@ -93,9 +93,9 @@ class TestController extends Controller
         $data = $request->validate([
             'type'            => ['required', 'in:Weekly,Monthly'],
             'stream'          => ['required', 'in:school,madarsa,both'],
-            'class_level'     => ['nullable', 'integer', 'between:1,8'],
+            'class_level'     => ['nullable', 'integer', 'between:0,8'],
             'madarsa_section' => ['nullable', 'string', 'max:1'],
-            'class_no'        => ['nullable', 'integer', 'between:1,12'],
+            'class_no'        => ['nullable', 'integer', 'between:0,12'],
             'section'         => ['nullable', 'string', 'max:8'],
             'subject'         => ['required', 'string', 'max:120'],
             'test_date'       => $dateRules,
@@ -146,10 +146,10 @@ class TestController extends Controller
         if ($stream === 'both') {
             $cls = $test->class_level ?? $test->class_no;
             $msec = $test->madarsa_section ?? $test->section;
-            return sprintf('%s — %s (%s | Class %s | Madarsa Sec %s) on %s at %s. Total marks: %d', $prefix, $test->subject, $aud, $cls, $msec, $date->format('D d M Y'), $test->test_time, (int) $test->total_marks);
+            return sprintf('%s — %s (%s | %s | Madarsa Sec %s) on %s at %s. Total marks: %d', $prefix, $test->subject, $aud, \App\Models\Student::classLabel($cls), $msec, $date->format('D d M Y'), $test->test_time, (int) $test->total_marks);
         }
 
         $cls = $test->class_level ?? $test->class_no;
-        return sprintf('%s — %s (%s | Class %d-%s) on %s at %s. Total marks: %d', $prefix, $test->subject, $aud, (int)$cls, $test->section, $date->format('D d M Y'), $test->test_time, (int) $test->total_marks);
+        return sprintf('%s — %s (%s | %s-%s) on %s at %s. Total marks: %d', $prefix, $test->subject, $aud, \App\Models\Student::classLabel($cls), $test->section, $date->format('D d M Y'), $test->test_time, (int) $test->total_marks);
     }
 }

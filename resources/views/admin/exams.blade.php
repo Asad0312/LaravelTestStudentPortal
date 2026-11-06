@@ -20,7 +20,7 @@
           </select>
         </div>
         <div class="mb-2" id="exClass"><label class="muted" style="font-size:12px;">Class (leave empty for all)</label>
-          <select class="form-ctrl" name="class_level"><option value="">Sab</option>@for($i=1;$i<=8;$i++)<option value="{{ $i }}">Class {{ $i }}</option>@endfor</select>
+          <select class="form-ctrl" name="class_level"><option value="">Sab</option><option value="0">Montessori</option>@for($i=1;$i<=8;$i++)<option value="{{ $i }}">Class {{ $i }}</option>@endfor</select>
         </div>
         <div class="mb-2" id="exSec" style="display:none;"><label class="muted" style="font-size:12px;">Madarsa Section (leave empty for all)</label>
           <select class="form-ctrl" name="madarsa_section"><option value="">Sab</option>@foreach(['A','B','C','D'] as $s)<option value="{{ $s }}">{{ $s }}</option>@endforeach</select>
@@ -41,7 +41,7 @@
               <tr>
                 <td><b>{{ $e->title }}</b></td>
                 <td>{{ $e->exam_month->format('M Y') }}</td>
-                <td>{{ ucfirst($e->stream) }} @if($e->class_level) | Class {{ $e->class_level }}@endif @if($e->madarsa_section) | Sec {{ $e->madarsa_section }}@endif</td>
+                <td>{{ ucfirst($e->stream) }} @if($e->class_level !== null) | {{ \App\Models\Student::classLabel($e->class_level) }}@endif @if($e->madarsa_section) | Sec {{ $e->madarsa_section }}@endif</td>
                 <td>Rs. {{ number_format($e->exam_fee) }}</td>
                 <td class="text-end">
                   <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#list{{ $e->id }}"><i class="fa-solid fa-list"></i> Fee List</button>
@@ -65,7 +65,7 @@
       <div class="modal-header">
         <div>
           <h6 class="modal-title fw-bold">{{ $e->title }} — Exam Fee List</h6>
-          <div class="muted" style="font-size:12px;">{{ $e->exam_month->format('F Y') }} • {{ ucfirst($e->stream) }} @if($e->class_level) | Class {{ $e->class_level }}@endif @if($e->madarsa_section) | Sec {{ $e->madarsa_section }}@endif • Fee: Rs. {{ number_format($e->exam_fee) }}</div>
+          <div class="muted" style="font-size:12px;">{{ $e->exam_month->format('F Y') }} • {{ ucfirst($e->stream) }} @if($e->class_level !== null) | {{ \App\Models\Student::classLabel($e->class_level) }}@endif @if($e->madarsa_section) | Sec {{ $e->madarsa_section }}@endif • Fee: Rs. {{ number_format($e->exam_fee) }}</div>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>

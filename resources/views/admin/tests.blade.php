@@ -29,7 +29,7 @@
             <td>{{ $t->subject }}</td>
             <td>
               {{ ucfirst($st) }}
-              @if($st !== 'madarsa') | Class {{ $t->class_level ?? $t->class_no }}@endif
+              @if($st !== 'madarsa') | {{ \App\Models\Student::classLabel($t->class_level ?? $t->class_no) }}@endif
               @if($st !== 'school') | Sec {{ $t->madarsa_section ?? $t->section }}@endif
             </td>
             <td>{{ $t->test_date?->format('D d M Y') }} • {{ $t->test_time }}</td>
@@ -66,7 +66,7 @@
           </div>
           <div class="col-md-4"><label class="muted" style="font-size:12px;">Subject *</label><input class="form-ctrl" name="subject" required placeholder="Mathematics" /></div>
           <div class="col-md-4" id="tClass"><label class="muted" style="font-size:12px;">Class *</label>
-            <select class="form-ctrl" name="class_level">@for($i=1;$i<=8;$i++)<option value="{{ $i }}">Class {{ $i }}</option>@endfor</select>
+            <select class="form-ctrl" name="class_level"><option value="0">Montessori</option>@for($i=1;$i<=8;$i++)<option value="{{ $i }}">Class {{ $i }}</option>@endfor</select>
           </div>
           <div class="col-md-4" id="tMadarsa" style="display:none;"><label class="muted" style="font-size:12px;">Madarsa Section *</label>
             <select class="form-ctrl" name="madarsa_section">@foreach(['A','B','C','D'] as $s)<option>{{ $s }}</option>@endforeach</select>
@@ -102,7 +102,7 @@
           </div>
           <div class="col-md-4"><label class="muted" style="font-size:12px;">Subject *</label><input class="form-ctrl" name="subject" value="{{ $t->subject }}" required /></div>
           <div class="col-md-4 teClass{{ $t->id }}" style="display:{{ $ts==='madarsa'?'none':'' }};"><label class="muted" style="font-size:12px;">Class *</label>
-            <select class="form-ctrl" name="class_level">@for($i=1;$i<=8;$i++)<option value="{{ $i }}" {{ ($t->class_level??$t->class_no)==$i?'selected':'' }}>Class {{ $i }}</option>@endfor</select>
+            <select class="form-ctrl" name="class_level"><option value="0" {{ (int)($t->class_level??$t->class_no)===0?'selected':'' }}>Montessori</option>@for($i=1;$i<=8;$i++)<option value="{{ $i }}" {{ (int)($t->class_level??$t->class_no)===$i?'selected':'' }}>Class {{ $i }}</option>@endfor</select>
           </div>
           <div class="col-md-4 teMad{{ $t->id }}" style="display:{{ $ts==='school'?'none':'' }};"><label class="muted" style="font-size:12px;">Madarsa Section *</label>
             <select class="form-ctrl" name="madarsa_section">@foreach(['A','B','C','D'] as $s)<option {{ ($t->madarsa_section??$t->section)===$s?'selected':'' }}>{{ $s }}</option>@endforeach</select>

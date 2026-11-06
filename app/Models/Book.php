@@ -18,11 +18,12 @@ class Book extends Model
     public static function templates(): array
     {
         $school = [];
-        for ($c = 1; $c <= 8; $c++) {
-            $count = match($c) { 1 => 4, 2 => 5, 3 => 6, 4 => 6, 5 => 7, 6 => 7, 7 => 8, 8 => 8, default => 4 };
+        for ($c = 0; $c <= 8; $c++) {
+            $count = match($c) { 0 => 4, 1 => 4, 2 => 5, 3 => 6, 4 => 6, 5 => 7, 6 => 7, 7 => 8, 8 => 8, default => 4 };
             $subjects = ['Urdu', 'English', 'Maths', 'Islamiyat', 'Science', 'Social Studies', 'Computer', 'Pakistan Studies'];
+            $label = Student::classLabel($c);
             for ($i = 0; $i < $count; $i++) {
-                $school[] = ['stream' => 'school', 'class_level' => $c, 'madarsa_section' => null, 'title' => $subjects[$i] . ' — Class ' . $c];
+                $school[] = ['stream' => 'school', 'class_level' => $c, 'madarsa_section' => null, 'title' => $subjects[$i] . ' — ' . $label];
             }
         }
 

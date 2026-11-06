@@ -38,7 +38,7 @@
         <img class="avatar-lg mx-auto" src="{{ $avatar }}" alt="" />
         <h5 class="mt-3 mb-0 fw-bold">{{ $student->name }}</h5>
         <span class="badge bg-soft-primary mt-1">{{ $student->student_id }}</span>
-        <p class="muted mt-2 mb-3" style="font-size:13px;">Class {{ $student->class_no }}-{{ $student->section }} • {{ $student->batch }}</p>
+        <p class="muted mt-2 mb-3" style="font-size:13px;">{{ \App\Models\Student::classLabel($student->class_no) }}-{{ $student->section }} • {{ $student->batch }}</p>
         <span class="badge {{ $student->status === 'Active' ? 'bg-soft-success' : 'bg-soft-danger' }}">{{ $student->status }}</span>
 
         <div class="text-start mt-3" style="font-size:13px;">
@@ -205,7 +205,7 @@
     <div class="d-flex flex-wrap gap-2">
       @forelse($recent as $s)
         <a href="{{ route('admin.lookup.index', ['q' => $s->student_id]) }}" class="btn btn-sm btn-outline-primary">
-          <b>{{ $s->student_id }}</b> — {{ $s->name }} ({{ $s->class_no }}-{{ $s->section }})
+          <b>{{ $s->student_id }}</b> — {{ $s->name }} ({{ \App\Models\Student::classLabel($s->class_no) }}-{{ $s->section }})
         </a>
       @empty
         <span class="muted" style="font-size:13px;">Abhi koi student nahi — pehle Students page se add karein.</span>

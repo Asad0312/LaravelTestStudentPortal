@@ -236,7 +236,7 @@
                 <div class="fw-semibold" style="font-size:13.5px;">{{ $book->title }}</div>
                 <div class="muted" style="font-size:11.5px;">
                   {{ ucfirst($book->stream) }}
-                  @if($book->stream !== 'madarsa' && $book->class_level) | Class {{ $book->class_level }}@endif
+                  @if($book->stream !== 'madarsa' && $book->class_level !== null) | {{ \App\Models\Student::classLabel($book->class_level) }}@endif
                   @if($book->stream !== 'school' && $book->madarsa_section) | Sec {{ $book->madarsa_section }}@endif
                 </div>
               </div>
