@@ -30,6 +30,7 @@
         'attendance'  => ['admin/attendance',     'fa-calendar-check',  'Attendance'],
         'scan'        => ['admin/scan',           'fa-qrcode',          'QR Attendance'],
         'fees'        => ['admin/fees',           'fa-money-bill-wave', 'Fee Management'],
+        'expenses'    => ['admin/expenses',       'fa-receipt',         'Office Expenses'],
         'exams'       => ['admin/exams',          'fa-file-lines',      'Exams & Fees'],
         'tests'       => ['admin/tests',          'fa-list-check',      'Test Plan'],
         'marks'       => ['admin/marks',          'fa-square-poll-vertical', 'Marks'],

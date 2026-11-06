@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\FeeController;
 use App\Http\Controllers\Admin\LookupController;
 use App\Http\Controllers\Admin\MarkController;
 use App\Http\Controllers\Admin\MessageController;
+use App\Http\Controllers\Admin\OfficeExpenseController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\TeacherController;
@@ -92,6 +93,11 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     Route::post('teachers/{id}/delete', [TeacherController::class, 'destroy'])->name('teachers.destroy');
     Route::post('teachers/pay', [TeacherController::class, 'pay'])->name('teachers.pay');
     Route::get('teachers/history/{id}', [TeacherController::class, 'history'])->name('teachers.history');
+
+    Route::get('expenses', [OfficeExpenseController::class, 'index'])->name('expenses.index');
+    Route::post('expenses', [OfficeExpenseController::class, 'store'])->name('expenses.store');
+    Route::post('expenses/{id}/update', [OfficeExpenseController::class, 'update'])->name('expenses.update');
+    Route::post('expenses/{id}/delete', [OfficeExpenseController::class, 'destroy'])->name('expenses.destroy');
 
     Route::get('export/{type}', [ExportController::class, 'export'])->name('export');
 });
