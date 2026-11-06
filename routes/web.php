@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\MarkController;
 use App\Http\Controllers\Admin\MessageController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\AdmissionController as AdminAdmissionController;
 use App\Http\Controllers\Admin\TestController;
 use App\Http\Controllers\AuthController;
@@ -84,6 +85,13 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     Route::post('admissions', [AdminAdmissionController::class, 'store'])->name('admissions.store');
     Route::post('admissions/{id}/approve', [AdminAdmissionController::class, 'approve'])->name('admissions.approve');
     Route::post('admissions/{id}/reject', [AdminAdmissionController::class, 'reject'])->name('admissions.reject');
+
+    Route::get('teachers', [TeacherController::class, 'index'])->name('teachers.index');
+    Route::post('teachers', [TeacherController::class, 'store'])->name('teachers.store');
+    Route::post('teachers/{id}/update', [TeacherController::class, 'update'])->name('teachers.update');
+    Route::post('teachers/{id}/delete', [TeacherController::class, 'destroy'])->name('teachers.destroy');
+    Route::post('teachers/pay', [TeacherController::class, 'pay'])->name('teachers.pay');
+    Route::get('teachers/history/{id}', [TeacherController::class, 'history'])->name('teachers.history');
 
     Route::get('export/{type}', [ExportController::class, 'export'])->name('export');
 });

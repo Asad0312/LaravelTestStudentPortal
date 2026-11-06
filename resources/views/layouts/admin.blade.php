@@ -24,6 +24,7 @@
     $nav = [
         'dashboard'   => ['admin',                'fa-gauge-high',      'Dashboard'],
         'students'    => ['admin/students',       'fa-users',           'Students'],
+        'teachers'    => ['admin/teachers',       'fa-chalkboard-user', 'Teachers'],
         'admissions'  => ['admin/admissions',     'fa-user-plus',       'Admissions'],
         'lookup'      => ['admin/lookup',         'fa-magnifying-glass','Student Lookup'],
         'attendance'  => ['admin/attendance',     'fa-calendar-check',  'Attendance'],
