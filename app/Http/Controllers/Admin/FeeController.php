@@ -32,7 +32,17 @@ class FeeController extends Controller
 
         $q = trim((string) $request->query('q', ''));
 
+        // "Class 1" / "Montessori" search me likha ho to class filter chal jayega.
+        $classFilter = Student::parseClassFilter($request->query('class'));
+        if ($classFilter === null && $q !== '') {
+            $classFilter = Student::parseClassFilter($q);
+            if ($classFilter !== null) {
+                $q = '';
+            }
+        }
+
         $students = Student::orderByRaw(Sql::numericSuffix('student_id'))
+            ->when($classFilter !== null, fn ($query) => Student::filterByClass($query, $classFilter))
             ->when($q !== '', function ($query) use ($q) {
                 $like = '%' . mb_strtolower($q) . '%';
                 $num = preg_replace('/\D+/', '', $q);
@@ -110,6 +120,7 @@ class FeeController extends Controller
             'pending'      => max(0, $billed - $collected),
             'carriedTotal' => $carriedTotal,
             'q'            => $q,
+            'classFilter'  => $classFilter,
             'recent'       => Payment::with('student')->latest('id')->limit(6)->get(),
         ]);
     }

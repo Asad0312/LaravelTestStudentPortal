@@ -22,9 +22,16 @@
 <div class="card card-soft p-3 mb-3">
   <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
     <form method="get" action="{{ route('admin.fees.index') }}" class="d-flex flex-wrap gap-2" style="flex:1;min-width:280px;">
-      <input class="form-ctrl" type="text" name="q" value="{{ $q }}" placeholder="Search by Student ID / Name / Phone / WhatsApp" style="flex:1;min-width:260px;" />
+      <select class="form-ctrl" name="class" style="max-width:150px;">
+        <option value="">All Classes</option>
+        <option value="0" {{ $classFilter === 0 ? 'selected' : '' }}>Montessori</option>
+        @for($i = 1; $i <= 8; $i++)
+          <option value="{{ $i }}" {{ $classFilter === $i ? 'selected' : '' }}>Class {{ $i }}</option>
+        @endfor
+      </select>
+      <input class="form-ctrl" type="text" name="q" value="{{ $q }}" placeholder="Student ID / Name / Phone / WhatsApp / Class 1" style="flex:1;min-width:220px;" />
       <button class="btn-primary-grad" style="padding:9px 16px;font-size:13px;" type="submit"><i class="fa-solid fa-magnifying-glass me-1"></i> Filter</button>
-      @if($q !== '')
+      @if($q !== '' || $classFilter !== null)
         <a class="btn btn-light" style="padding:9px 14px;font-size:13px;" href="{{ route('admin.fees.index') }}">Clear</a>
       @endif
     </form>
@@ -39,8 +46,9 @@
   <div class="muted mt-2" style="font-size:12px;">
     <i class="fa-solid fa-circle-info text-primary"></i>
     Har mahine ki 1 tareekh ko active students ki fee row automatically banti hai. Pichle mahine ka baqi balance next month ki fee me add hota hai.
-    @if($q !== '')
-      <span class="ms-1">Filter: <b>{{ $q }}</b> — {{ $rows->count() }} result(s).</span>
+    Class filter dropdown se ya search me <b>Class 1</b> / <b>Montessori</b> likh kar bhi kar saktay hain.
+    @if($q !== '' || $classFilter !== null)
+      <span class="ms-1">Filter: <b>{{ $classFilter !== null ? \App\Models\Student::classLabel($classFilter) : $q }}</b> — {{ $rows->count() }} result(s).</span>
     @endif
   </div>
 </div>

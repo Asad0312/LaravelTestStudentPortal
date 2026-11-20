@@ -54,6 +54,40 @@ class Student extends Model
         return strtolower(preg_replace('/\s+/', '', $name)) . '123';
     }
 
+    /**
+     * Accepts "0", "1", "class 1", "Class 1", "montessori" etc.
+     * Returns 0-8 or null when it is not a class filter.
+     */
+    public static function parseClassFilter(?string $value): ?int
+    {
+        $v = strtolower(trim((string) $value));
+        if ($v === '') {
+            return null;
+        }
+        if (in_array($v, ['montessori', 'montessory', 'm'], true)) {
+            return 0;
+        }
+        if (preg_match('/^(?:class|cls|class-)\s*[:#]?\s*([0-8])$/', $v, $m)) {
+            return (int) $m[1];
+        }
+        if (preg_match('/^([0-8])$/', $v)) {
+            return (int) $v;
+        }
+
+        return null;
+    }
+
+    /** Apply a class filter to a student query (Montessori = 0). */
+    public static function filterByClass($query, ?int $class)
+    {
+        if ($class === null) {
+            return $query;
+        }
+
+        return $query->where('stream', '<>', 'madarsa')
+            ->whereRaw('COALESCE(class_level, class_no) = ?', [$class]);
+    }
+
     /** Label for a numeric class level (0 = Montessori). */
     public static function classLabel(int|string|null $classNo): string
     {

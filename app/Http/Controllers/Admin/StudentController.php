@@ -21,6 +21,15 @@ class StudentController extends Controller
     {
         $q = trim((string) $request->query('q', ''));
 
+        // "Class 1" ya "Montessori" search box me likha ho to class filter samjho.
+        $classFilter = Student::parseClassFilter($request->query('class'));
+        if ($classFilter === null && $q !== '') {
+            $classFilter = Student::parseClassFilter($q);
+            if ($classFilter !== null) {
+                $q = '';
+            }
+        }
+
         $students = Student::query()
             ->when($q !== '', function ($query) use ($q) {
                 $query->where(function ($w) use ($q) {
@@ -30,13 +39,15 @@ class StudentController extends Controller
                         ->orWhere('class_no', 'like', "%{$q}%");
                 });
             })
+            ->when($classFilter !== null, fn ($query) => Student::filterByClass($query, $classFilter))
             ->orderByRaw(Sql::numericSuffix('student_id'))
             ->get();
 
         return view('admin.students', [
-            'students' => $students,
-            'q'        => $q,
-            'nextId'   => Student::nextStudentId(),
+            'students'    => $students,
+            'q'           => $q,
+            'classFilter' => $classFilter,
+            'nextId'      => Student::nextStudentId(),
         ]);
     }
 

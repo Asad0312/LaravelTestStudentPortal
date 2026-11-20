@@ -6,9 +6,19 @@
 @section('content')
 <div class="card card-soft p-3 mb-3">
   <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
-    <form method="get" action="{{ url('admin/students') }}" class="d-flex gap-2" style="min-width:280px;flex:1;">
-      <input class="form-ctrl" type="text" name="q" value="{{ $q }}" placeholder="Search — name, STU-1001, class..." style="flex:1;" />
+    <form method="get" action="{{ url('admin/students') }}" class="d-flex flex-wrap gap-2" style="min-width:280px;flex:1;">
+      <select class="form-ctrl" name="class" style="max-width:150px;">
+        <option value="">All Classes</option>
+        <option value="0" {{ $classFilter === 0 ? 'selected' : '' }}>Montessori</option>
+        @for($i = 1; $i <= 8; $i++)
+          <option value="{{ $i }}" {{ $classFilter === $i ? 'selected' : '' }}>Class {{ $i }}</option>
+        @endfor
+      </select>
+      <input class="form-ctrl" type="text" name="q" value="{{ $q }}" placeholder="Name / STU-1001 / Class 1" style="flex:1;min-width:180px;" />
       <button class="btn-grad" style="padding:9px 16px;font-size:13px;" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+      @if($q !== '' || $classFilter !== null)
+        <a class="btn btn-light" style="padding:9px 14px;font-size:13px;" href="{{ url('admin/students') }}">Clear</a>
+      @endif
     </form>
     <div class="d-flex gap-2">
       <a class="btn-grad" style="padding:9px 14px;font-size:13px;" href="{{ url('admin/export/students') }}"><i class="fa-solid fa-file-csv me-1"></i> CSV</a>
@@ -16,6 +26,10 @@
         <i class="fa-solid fa-user-plus me-1"></i> Add Student
       </button>
     </div>
+  </div>
+  <div class="muted mt-2" style="font-size:12px;">
+    <i class="fa-solid fa-circle-info text-primary"></i>
+    Class filter: dropdown se select karein ya search box me <b>Class 1</b> / <b>Montessori</b> likh kar filter kar saktay hain.
   </div>
 </div>
 
